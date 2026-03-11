@@ -40,9 +40,8 @@ export function ProgressionChart({ data }: ProgressionChartProps) {
           <h3 className="text-xl font-bold text-slate-900 dark:text-white">Predicted Progression to Multiple Myeloma</h3>
           <p className="text-sm text-slate-500">Longitudinal projection based on current clinical markers</p>
         </div>
-        <div className="flex bg-slate-100 dark:bg-slate-800 p-1 rounded-lg">
-          <button className="px-3 py-1.5 text-xs font-bold bg-white dark:bg-slate-700 shadow-sm rounded-md">Linear Scale</button>
-          <button className="px-3 py-1.5 text-xs font-bold text-slate-500 hover:text-primary">Probability %</button>
+        <div className="flex items-center">
+          <span className="px-3 py-1.5 text-xs font-bold text-slate-600 dark:text-slate-400">Probability %</span>
         </div>
       </div>
       <ResponsiveContainer width="100%" height={300}>
@@ -55,7 +54,7 @@ export function ProgressionChart({ data }: ProgressionChartProps) {
           </defs>
           <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
           <XAxis dataKey="year" />
-          <YAxis />
+          <YAxis domain={[0, 100]} tickFormatter={(v) => `${v}%`} />
           <Tooltip formatter={(value) => `${(value as number).toFixed(1)}%`} />
           <Area
             type="monotone"
