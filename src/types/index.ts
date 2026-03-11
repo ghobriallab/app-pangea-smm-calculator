@@ -3,6 +3,8 @@ export interface PatientInputs {
   sflcRatio: number;
   boneMarrow: number;
   age: number;
+  creatinine: number;
+  hemoglobin: number;
 }
 
 export interface RiskSummary {
@@ -10,6 +12,11 @@ export interface RiskSummary {
   year2: number;
   year5: number;
   year10: number;
+}
+
+export interface RiskSummaryWithHistory {
+  latest: RiskSummary;
+  history?: RiskSummary;
 }
 
 export interface ChartDataPoint {
@@ -30,4 +37,6 @@ export interface PredictionResult {
 export interface HistoricalEntry {
   date: string;
   mSpike: number;
+  sflcRatio?: number;
+  age?: number;
 }
