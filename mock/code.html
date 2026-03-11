@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>PANGEA-SMM Clinical Risk Calculator</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#ec5b13",
+                        "background-light": "#f8f6f6",
+                        "background-dark": "#221610",
+                    },
+                    fontFamily: {
+                        "display": ["Public Sans", "sans-serif"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        body { font-family: 'Public Sans', sans-serif; }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(236, 91, 19, 0.1);
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 min-h-screen">
+<!-- Top Navigation Bar -->
+<header class="sticky top-0 z-50 bg-white/80 dark:bg-background-dark/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-800">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+<div class="flex justify-between items-center h-16">
+<div class="flex items-center gap-3">
+<div class="bg-primary p-1.5 rounded-lg">
+<span class="material-symbols-outlined text-white text-2xl">biotech</span>
+</div>
+<h2 class="text-xl font-black tracking-tight text-slate-900 dark:text-white uppercase">The Pangea Model</h2>
+</div>
+<nav class="hidden md:flex space-x-8">
+<a class="text-sm font-semibold text-primary border-b-2 border-primary pb-1" href="#">The Calculator</a>
+<a class="text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-primary transition-colors" href="#">Validation App</a>
+<a class="text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-primary transition-colors" href="#">How It Works</a>
+<a class="text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-primary transition-colors" href="#">What is PANGEA?</a>
+</nav>
+<div class="flex items-center gap-4">
+<button class="p-2 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors">
+<span class="material-symbols-outlined">account_circle</span>
+</button>
+</div>
+</div>
+</div>
+</header>
+<main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+<!-- Hero Section -->
+<section class="mb-10 rounded-3xl overflow-hidden relative">
+<div class="absolute inset-0 bg-gradient-to-br from-primary/10 via-background-light to-transparent dark:from-primary/20 dark:via-background-dark dark:to-transparent z-0"></div>
+<div class="relative z-10 px-8 py-12 md:py-16 text-center max-w-4xl mx-auto">
+<h1 class="text-4xl md:text-5xl font-black text-slate-900 dark:text-white mb-6 leading-tight">
+                    Welcome to the PANGEA-SMM Calculator
+                </h1>
+<p class="text-lg text-slate-600 dark:text-slate-400 mb-8 leading-relaxed">
+                    The PANGEA-SMM Model predicts your risk of progression from SMM to multiple myeloma. 
+                    The clinical gold-standard calculator for 20-2-20 criteria is also integrated below for comprehensive assessment.
+                </p>
+<div class="flex justify-center gap-4">
+<button class="bg-primary text-white px-8 py-3 rounded-xl font-bold hover:opacity-90 transition-opacity shadow-lg shadow-primary/20">
+                        Start Assessment
+                    </button>
+<button class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-8 py-3 rounded-xl font-bold hover:bg-slate-50 transition-colors">
+                        View Documentation
+                    </button>
+</div>
+</div>
+</section>
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+<!-- Sidebar: Patient Values -->
+<aside class="lg:col-span-4 space-y-6">
+<div class="bg-white dark:bg-slate-900 p-6 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800">
+<div class="flex items-center gap-2 mb-6">
+<span class="material-symbols-outlined text-primary">analytics</span>
+<h3 class="text-lg font-bold">Current Patient Values</h3>
+</div>
+<div class="space-y-5">
+<label class="block">
+<span class="text-sm font-semibold text-slate-700 dark:text-slate-300 block mb-1.5">Serum Free Light Chain Ratio</span>
+<input class="w-full bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 rounded-xl focus:ring-primary focus:border-primary" placeholder="Enter ratio (e.g. 15.5)" type="text"/>
+</label>
+<label class="block">
+<span class="text-sm font-semibold text-slate-700 dark:text-slate-300 block mb-1.5">M-Spike (g/dL)</span>
+<input class="w-full bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 rounded-xl focus:ring-primary focus:border-primary" placeholder="e.g. 3.0" type="text"/>
+</label>
+<div class="grid grid-cols-2 gap-4">
+<label class="block">
+<span class="text-sm font-semibold text-slate-700 dark:text-slate-300 block mb-1.5">Creatinine (mg/dL)</span>
+<input class="w-full bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 rounded-xl focus:ring-primary focus:border-primary" placeholder="0.9" type="text"/>
+</label>
+<label class="block">
+<span class="text-sm font-semibold text-slate-700 dark:text-slate-300 block mb-1.5">Age (years)</span>
+<input class="w-full bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 rounded-xl focus:ring-primary focus:border-primary" placeholder="65" type="number"/>
+</label>
+</div>
+<div class="pt-4 border-t border-slate-100 dark:border-slate-800">
+<label class="flex items-center gap-3 cursor-pointer group mb-4">
+<input class="w-5 h-5 rounded text-primary focus:ring-primary border-slate-300" type="checkbox"/>
+<span class="text-sm font-medium text-slate-700 dark:text-slate-300 group-hover:text-primary transition-colors">Bone Marrow Biopsy Taken?</span>
+</label>
+<label class="block pl-8 opacity-50">
+<span class="text-sm font-semibold text-slate-700 dark:text-slate-300 block mb-1.5">% Plasma Cells</span>
+<input class="w-full bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 rounded-xl focus:ring-primary focus:border-primary" disabled="" placeholder="e.g. 15" type="text"/>
+</label>
+</div>
+</div>
+</div>
+<!-- Historical Lab Work -->
+<div class="bg-white dark:bg-slate-900 p-6 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800">
+<div class="flex items-center justify-between mb-6">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">history</span>
+<h3 class="text-lg font-bold">Historical Lab Work</h3>
+</div>
+</div>
+<div class="p-4 bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-slate-100 dark:border-slate-800 mb-4">
+<div class="flex items-center justify-between mb-3">
+<span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Previous Entry</span>
+<button class="text-slate-400 hover:text-red-500"><span class="material-symbols-outlined text-sm">delete</span></button>
+</div>
+<div class="grid grid-cols-2 gap-4">
+<div>
+<p class="text-[10px] font-bold text-slate-500 uppercase mb-1">Date</p>
+<p class="text-sm font-medium">March 2026</p>
+</div>
+<div>
+<p class="text-[10px] font-bold text-slate-500 uppercase mb-1">M-Spike</p>
+<p class="text-sm font-medium">2.8 g/dL</p>
+</div>
+</div>
+</div>
+<button class="w-full flex items-center justify-center gap-2 py-3 border-2 border-dashed border-slate-200 dark:border-slate-700 rounded-xl text-slate-500 font-bold hover:border-primary hover:text-primary transition-all">
+<span class="material-symbols-outlined">add</span>
+                        Add Lab Result
+                    </button>
+</div>
+</aside>
+<!-- Main Content: Risk Predictions -->
+<div class="lg:col-span-8 space-y-6">
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+<!-- Card 1: 20/2/20 Prediction -->
+<div class="bg-white dark:bg-slate-900 p-6 rounded-2xl shadow-sm border-l-4 border-l-amber-500 border border-slate-200 dark:border-slate-800">
+<div class="flex justify-between items-start mb-4">
+<h4 class="font-bold text-slate-900 dark:text-white">20/2/20 Prediction</h4>
+<span class="px-3 py-1 bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 text-xs font-black uppercase tracking-wider rounded-full">Intermediate Risk</span>
+</div>
+<p class="text-sm text-slate-600 dark:text-slate-400 leading-relaxed mb-6">
+                            According to the 20/2/20 model, the patient has an <span class="font-bold text-slate-900 dark:text-white">Intermediate (17.9%)</span> risk of progressing to multiple myeloma in two years.
+                        </p>
+<div class="flex items-center gap-2 text-[10px] text-slate-400 font-medium italic">
+<span class="material-symbols-outlined text-sm">menu_book</span>
+                            Ref: Mayo Clinic Proceedings (2020)
+                        </div>
+</div>
+<!-- Card 2: Risk Prediction Summary -->
+<div class="bg-white dark:bg-slate-900 p-6 rounded-2xl shadow-sm border-l-4 border-l-emerald-500 border border-slate-200 dark:border-slate-800">
+<div class="flex justify-between items-start mb-4">
+<h4 class="font-bold text-slate-900 dark:text-white">Risk Prediction Summary</h4>
+<span class="px-3 py-1 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 text-xs font-black uppercase tracking-wider rounded-full">Low Risk</span>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left text-sm">
+<thead>
+<tr class="text-[10px] uppercase tracking-widest text-slate-400 border-b border-slate-100 dark:border-slate-800">
+<th class="pb-2 font-black">Timeline</th>
+<th class="pb-2 font-black text-right">Probability</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-slate-100 dark:divide-slate-800">
+<tr>
+<td class="py-2.5 font-medium">1 Year</td>
+<td class="py-2.5 text-right font-bold text-primary">2.4%</td>
+</tr>
+<tr>
+<td class="py-2.5 font-medium">2 Years</td>
+<td class="py-2.5 text-right font-bold text-primary">5.1%</td>
+</tr>
+<tr>
+<td class="py-2.5 font-medium">5 Years</td>
+<td class="py-2.5 text-right font-bold text-primary">12.8%</td>
+</tr>
+<tr>
+<td class="py-2.5 font-medium">10 Years</td>
+<td class="py-2.5 text-right font-bold text-primary">24.2%</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<!-- Chart Section -->
+<div class="bg-white dark:bg-slate-900 p-8 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800">
+<div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
+<div>
+<h3 class="text-xl font-bold text-slate-900 dark:text-white">Predicted Progression to Multiple Myeloma</h3>
+<p class="text-sm text-slate-500">Longitudinal projection based on current clinical markers</p>
+</div>
+<div class="flex bg-slate-100 dark:bg-slate-800 p-1 rounded-lg">
+<button class="px-3 py-1.5 text-xs font-bold bg-white dark:bg-slate-700 shadow-sm rounded-md">Linear Scale</button>
+<button class="px-3 py-1.5 text-xs font-bold text-slate-500 hover:text-primary">Probability %</button>
+</div>
+</div>
+<!-- Simulated Chart Area -->
+<div class="relative h-64 w-full">
+<svg class="w-full h-full" preserveaspectratio="none" viewbox="0 0 800 200">
+<!-- Shaded Confidence Interval -->
+<path d="M0,180 Q200,160 400,120 Q600,80 800,40 L800,100 Q600,140 400,160 Q200,190 0,195 Z" fill="rgba(236, 91, 19, 0.1)"></path>
+<!-- Main Line -->
+<path d="M0,188 Q200,175 400,140 Q600,110 800,70" fill="none" stroke="#ec5b13" stroke-width="3"></path>
+<!-- Grid Lines -->
+<line stroke="#e2e8f0" stroke-dasharray="4" x1="0" x2="800" y1="180" y2="180"></line>
+<line stroke="#e2e8f0" stroke-dasharray="4" x1="0" x2="800" y1="120" y2="120"></line>
+<line stroke="#e2e8f0" stroke-dasharray="4" x1="0" x2="800" y1="60" y2="60"></line>
+</svg>
+<!-- Axis Labels -->
+<div class="absolute bottom-[-24px] left-0 w-full flex justify-between text-[10px] font-black text-slate-400 uppercase tracking-widest px-2">
+<span>0 Years</span>
+<span>2.5 Years</span>
+<span>5 Years</span>
+<span>7.5 Years</span>
+<span>10 Years</span>
+</div>
+<!-- Tooltip Placeholder -->
+<div class="absolute top-10 left-[45%] bg-slate-900 text-white px-3 py-2 rounded-lg text-xs shadow-xl flex flex-col items-center">
+<span class="font-bold">5.0 Years</span>
+<span class="text-primary font-black">12.8% Risk</span>
+<div class="w-2 h-2 bg-slate-900 rotate-45 absolute -bottom-1"></div>
+</div>
+</div>
+<div class="mt-12 flex items-center justify-center gap-6">
+<div class="flex items-center gap-2">
+<span class="w-3 h-3 rounded-full bg-primary"></span>
+<span class="text-xs font-semibold text-slate-600 dark:text-slate-400">Mean Prediction</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="w-3 h-3 rounded-full bg-primary/20"></span>
+<span class="text-xs font-semibold text-slate-600 dark:text-slate-400">95% Confidence Interval</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+<footer class="mt-20 py-10 border-t border-slate-200 dark:border-slate-800 text-center">
+<div class="flex flex-col items-center gap-4">
+<div class="flex items-center gap-2 opacity-50 grayscale">
+<div class="bg-slate-400 p-1 rounded-sm">
+<span class="material-symbols-outlined text-white text-xs">biotech</span>
+</div>
+<h2 class="text-sm font-black tracking-tight text-slate-900 dark:text-white uppercase">The Pangea Model</h2>
+</div>
+<p class="text-xs text-slate-500 max-w-xl mx-auto px-4">
+                Disclaimer: This calculator is intended for use by healthcare professionals for informational purposes only. Clinical decisions should be based on comprehensive patient evaluations.
+            </p>
+<div class="flex gap-6 mt-4">
+<a class="text-xs font-bold text-slate-400 hover:text-primary transition-colors" href="#">Privacy Policy</a>
+<a class="text-xs font-bold text-slate-400 hover:text-primary transition-colors" href="#">Terms of Use</a>
+<a class="text-xs font-bold text-slate-400 hover:text-primary transition-colors" href="#">Contact Support</a>
+</div>
+</div>
+</footer>
+</body></html>
