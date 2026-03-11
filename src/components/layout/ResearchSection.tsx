@@ -49,29 +49,17 @@ export function ResearchSection() {
             <img src="/dfci-logo.avif" alt="Dana-Farber Cancer Institute" className="h-12" />
           </div>
           <p className="text-xs text-slate-500 dark:text-slate-400 mb-3">
-            Research and development of the PANGEA Models by{' '}
-            <a href="#" className="font-semibold text-primary hover:underline">
-              Elena Chadarevian
-            </a>
-            , PhD, MD{' '}
-            <a href="#" className="font-semibold text-primary hover:underline">
-              Anouk Couvin
-            </a>
-            , MD,{' '}
-            <a href="#" className="font-semibold text-primary hover:underline">
-              Erdogan Erzan
-            </a>
-            , PhD,{' '}
-            <a href="#" className="font-semibold text-primary hover:underline">
-              Samrina Gerami
-            </a>
-            , PhD, and others.
+            Research and development of the PANGEA Models by Floris Chabrun, PharmD, PhD, Annie Cowan, MD, Federico Ferrari, PhD, Susanna Gentile, PhD, and Daniel Schwartz, PhD.
+          </p>
+          <p className="text-xs text-slate-500 dark:text-slate-400 mb-3">
+            Leadership provided by Irene Ghobrial, MD and Lorenzo Trippa, PhD.
           </p>
           <p className="text-xs text-slate-500 dark:text-slate-400 max-w-3xl mx-auto">
-            To learn more about the PANGEA Models, please see our publication in Nature Medicine.
+            To learn more about the PANGEA Models, please read our publication in{' '}
+            <a className="font-bold text-primary hover:underline" href="https://www.nature.com/nm/" target="_blank" rel="noopener noreferrer">Nature Medicine</a>.
           </p>
           <p className="text-xs text-slate-400 dark:text-slate-500 mt-4">
-            © 2025 by the Urtext Lab | Dana-Farber Cancer Institute | Boston, MA, USA
+            © 2023 by the Ghobrial Lab | Dana-Farber Cancer Institute | Boston, MA | USA
           </p>
         </div>
       </div>
