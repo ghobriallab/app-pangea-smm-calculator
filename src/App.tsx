@@ -68,6 +68,9 @@ function App() {
 
   return (
     <div className="min-h-screen flex flex-col bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100">
+      <div className="bg-amber-400 text-amber-900 text-center text-sm font-semibold py-2 px-4">
+        ⚠ This tool is under active development and is not intended for clinical use.
+      </div>
       <Navbar />
 
       <main className="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full">
