@@ -14,7 +14,6 @@ export function LabEntryDialog({
   isOpen,
   onClose,
   onSubmit,
-  title = 'Add Lab Result',
   initialInputs,
   initialDate,
 }: LabEntryDialogProps) {
