@@ -77,11 +77,11 @@ function App() {
         {/* Hero Section */}
         <section className="mb-3 rounded-3xl overflow-hidden relative">
           <div className="absolute inset-0 bg-gradient-to-br from-primary/15 via-primary/5 to-transparent dark:from-primary/25 dark:via-primary/10 dark:to-transparent z-0"></div>
-          <div className="relative z-10 px-8 py-6 md:py-8 text-center max-w-4xl mx-auto">
-            <h1 className="text-4xl md:text-5xl font-black text-slate-900 dark:text-white mb-3 leading-tight">
+          <div className="relative z-10 px-4 sm:px-6 md:px-8 py-5 md:py-8 text-center max-w-4xl mx-auto">
+            <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black text-slate-900 dark:text-white mb-3 leading-tight">
               Welcome to the PANGEA-SMM Calculator
             </h1>
-            <p className="text-lg text-slate-600 dark:text-slate-400 mb-2 leading-relaxed">
+            <p className="text-sm sm:text-base lg:text-lg text-slate-600 dark:text-slate-400 mb-2 leading-relaxed">
               The PANGEA-SMM Model predicts your risk of progression from SMM to multiple myeloma.
               The clinical gold-standard calculator for 20-2-20 criteria is also integrated below for comprehensive assessment.
             </p>
@@ -89,7 +89,7 @@ function App() {
         </section>
 
         {/* Main Content Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-6 lg:gap-8">
           {/* Sidebar: Patient Values */}
           <aside className="lg:col-span-3 space-y-6">
             <PatientInputForm
@@ -110,7 +110,7 @@ function App() {
 
           {/* Main Content: Risk Predictions */}
           <div className="lg:col-span-9 space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-5 lg:gap-6">
               {/* 20/2/20 Prediction Card */}
               <div className={`md:col-span-1 bg-white dark:bg-slate-900 p-6 rounded-2xl shadow-sm border-l-4 border border-slate-200 dark:border-slate-800 ${
                 result?.riskColor === 'green' ? 'border-l-green-500' :
@@ -152,7 +152,7 @@ function App() {
               </div>
 
               {/* Risk Prediction Summary Card */}
-              <div className="md:col-span-2">
+              <div className="sm:col-span-2 md:col-span-2">
                 <RiskPredictionSummary
                   riskLabel={result?.riskLabel || ''}
                   riskColor={result?.riskColor || 'orange'}
