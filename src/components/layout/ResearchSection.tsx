@@ -59,7 +59,7 @@ export function ResearchSection() {
             <a className="font-bold text-primary hover:underline" href="https://www.nature.com/nm/" target="_blank" rel="noopener noreferrer">Nature Medicine</a>.
           </p>
           <p className="text-xs text-slate-400 dark:text-slate-500 mt-4">
-            © 2023 by the Ghobrial Lab | Dana-Farber Cancer Institute | Boston, MA | USA
+            © 2026 by the Ghobrial Lab | Dana-Farber Cancer Institute | Boston, MA | USA
           </p>
         </div>
       </div>
