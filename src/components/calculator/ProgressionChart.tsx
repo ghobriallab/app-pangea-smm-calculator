@@ -1,7 +1,7 @@
 import {
   Line,
   Area,
-  AreaChart,
+  ComposedChart,
   XAxis,
   YAxis,
   CartesianGrid,
@@ -15,6 +15,17 @@ interface ProgressionChartProps {
 }
 
 const PRIMARY_BLUE = '#6B8FC4';
+
+// Transform data so Recharts can render a CI band via stacked areas:
+// "lowerBase" = lower bound value (filled transparent)
+// "band" = upper - lower (the visible CI region on top)
+function transformForCIBand(data: ChartDataPoint[]) {
+  return data.map((pt) => ({
+    ...pt,
+    lowerBase: pt.lower,
+    band: pt.upper - pt.lower,
+  }));
+}
 
 export function ProgressionChart({ data }: ProgressionChartProps) {
   if (!data || data.length === 0) {
@@ -33,6 +44,8 @@ export function ProgressionChart({ data }: ProgressionChartProps) {
     );
   }
 
+  const chartData = transformForCIBand(data);
+
   return (
     <div className="bg-white dark:bg-slate-900 p-4 sm:p-6 md:p-8 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4 sm:mb-6 md:mb-8">
@@ -46,30 +59,49 @@ export function ProgressionChart({ data }: ProgressionChartProps) {
       </div>
       <div className="h-48 sm:h-64 md:h-72 lg:h-[300px]">
         <ResponsiveContainer width="100%" height="100%">
-          <AreaChart data={data} margin={{ top: 5, right: 10, left: -10, bottom: 5 }}>
+          <ComposedChart data={chartData} margin={{ top: 5, right: 10, left: -10, bottom: 5 }}>
             <defs>
-              <linearGradient id="colorArea" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor={PRIMARY_BLUE} stopOpacity={0.15} />
-                <stop offset="95%" stopColor={PRIMARY_BLUE} stopOpacity={0} />
+              <linearGradient id="colorBand" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="5%" stopColor={PRIMARY_BLUE} stopOpacity={0.2} />
+                <stop offset="95%" stopColor={PRIMARY_BLUE} stopOpacity={0.05} />
               </linearGradient>
             </defs>
             <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
-            <XAxis dataKey="year" />
+            <XAxis
+              dataKey="year"
+              type="number"
+              domain={[0, 'dataMax']}
+              ticks={[0, 1, 2, 5, 10]}
+              tickFormatter={(v) => `${v}y`}
+            />
             <YAxis domain={[0, 100]} tickFormatter={(v) => `${v}%`} />
-            <Tooltip formatter={(value) => `${(value as number).toFixed(1)}%`} />
+            <Tooltip
+              formatter={(value, name) => {
+                if (name === 'lowerBase' || name === 'band') return null;
+                return [`${(value as number).toFixed(1)}%`, name];
+              }}
+            />
+            {/* Transparent base up to lower CI bound */}
             <Area
               type="monotone"
-              dataKey="lower"
+              dataKey="lowerBase"
+              stackId="ci"
               fill="transparent"
               stroke="none"
-              name="Lower CI"
+              legendType="none"
+              tooltipType="none"
+              name="lowerBase"
             />
+            {/* Visible CI band from lower to upper */}
             <Area
               type="monotone"
-              dataKey="upper"
-              fill="url(#colorArea)"
+              dataKey="band"
+              stackId="ci"
+              fill="url(#colorBand)"
               stroke="none"
-              name="Upper CI"
+              legendType="none"
+              tooltipType="none"
+              name="band"
             />
             <Line
               type="monotone"
@@ -79,7 +111,7 @@ export function ProgressionChart({ data }: ProgressionChartProps) {
               name="Predicted"
               dot={false}
             />
-          </AreaChart>
+          </ComposedChart>
         </ResponsiveContainer>
       </div>
       <div className="mt-4 sm:mt-6 md:mt-8 flex items-center justify-center gap-6">
