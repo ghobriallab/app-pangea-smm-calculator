@@ -4,7 +4,7 @@ import type { PatientInputs } from '../../types';
 interface LabEntryDialogProps {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (date: string, inputs: PatientInputs) => void;
+  onSubmit: (displayDate: string, rawDate: string, inputs: PatientInputs) => void;
   title?: string;
   initialInputs?: PatientInputs;
   initialDate?: string;
@@ -55,7 +55,7 @@ export function LabEntryDialog({
       year: 'numeric',
       month: 'long',
     });
-    onSubmit(formattedDate, inputs);
+    onSubmit(formattedDate, selectedDate, inputs);
     onClose();
   };
 

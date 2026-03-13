@@ -1,0 +1,28 @@
+{
+    "model": "static",
+    "risk_20_2_20": {
+      "category": "Intermediate",
+      "reference_2yr_pct": 17.9,
+      "bone_marrow_included": true
+    },
+    "risk_pangea": {
+      "category": "Intermediate",
+      "probabilities": {
+        "year_1": { "estimate": 0.082, "lower": 0.051, "upper": 0.124 },
+        "year_2": { "estimate": 0.158, "lower": 0.108, "upper": 0.218 },
+        "year_5": { "estimate": 0.341, "lower": 0.263, "upper": 0.421 },
+        "year_10": { "estimate": 0.512, "lower": 0.421, "upper": 0.598 }
+      },
+      "curve": [
+        { "x": 0.12, "y": 0.0102, "lower": 0.0041, "upper": 0.0198 },
+        { "x": 0.24, "y": 0.0198, "lower": 0.0089, "upper": 0.0351 },
+        { "x": 0.50, "y": 0.0341, "lower": 0.0171, "upper": 0.0574 },
+        { "x": 1.00, "y": 0.0821, "lower": 0.0512, "upper": 0.1241 },
+        { "x": 1.50, "y": 0.1134, "lower": 0.0731, "upper": 0.1651 },
+        { "x": 2.00, "y": 0.1582, "lower": 0.1081, "upper": 0.2184 },
+        { "x": 5.00, "y": 0.3412, "lower": 0.2631, "upper": 0.4211 },
+        { "x": 10.00, "y": 0.5124, "lower": 0.4212, "upper": 0.5981 }
+      ]
+    }
+  }
+  

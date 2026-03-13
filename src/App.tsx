@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Navbar } from './components/layout/Navbar';
 import { Footer } from './components/layout/Footer';
 import { ResearchSection } from './components/layout/ResearchSection';
@@ -19,26 +19,20 @@ function App() {
     hemoglobin: 0,
   });
 
-  // Default example result data to show on initial load
-  const [result, setResult] = useState<PredictionResult>({
-    riskLabel: 'INTERMEDIATE RISK',
-    riskColor: 'orange',
-    dd2dScore: 0.43,
-    riskSummary: {
-      year1: 6.1,
-      year2: 8.4,
-      year5: 16.3,
-      year10: 34.6,
-    },
-    progressionChart: [
-      { year: 0, predicted: 0, lower: 0, upper: 0 },
-      { year: 1, predicted: 6.1, lower: 3.2, upper: 9.8 },
-      { year: 2, predicted: 8.4, lower: 5.1, upper: 13.2 },
-      { year: 5, predicted: 16.3, lower: 10.5, upper: 23.4 },
-      { year: 10, predicted: 34.6, lower: 24.1, upper: 46.2 },
-    ],
-  });
+  const [result, setResult] = useState<PredictionResult | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const errorTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    if (error) {
+      if (errorTimerRef.current) clearTimeout(errorTimerRef.current);
+      errorTimerRef.current = setTimeout(() => setError(null), 10000);
+    }
+    return () => {
+      if (errorTimerRef.current) clearTimeout(errorTimerRef.current);
+    };
+  }, [error]);
   const [historicalEntries, setHistoricalEntries] = useState<HistoricalEntry[]>([]);
   const [historicalResult] = useState<PredictionResult | null>(null);
 
@@ -48,11 +42,14 @@ function App() {
 
   const handleSubmit = async () => {
     setIsLoading(true);
+    setError(null);
+    setResult(null);
     try {
-      const prediction = await fetchPrediction();
+      const prediction = await fetchPrediction(inputs, historicalEntries);
       setResult(prediction);
-    } catch (error) {
-      console.error('Error fetching prediction:', error);
+    } catch (err) {
+      console.error('Prediction error:', err);
+      setError(err instanceof Error ? err.message : 'An unexpected error occurred.');
     } finally {
       setIsLoading(false);
     }
@@ -113,14 +110,14 @@ function App() {
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-5 lg:gap-6">
               {/* 20/2/20 Prediction Card */}
               <div className={`md:col-span-1 bg-white dark:bg-slate-900 p-6 rounded-2xl shadow-sm border-l-4 border border-slate-200 dark:border-slate-800 ${
-                result?.riskColor === 'green' ? 'border-l-green-500' :
-                result?.riskColor === 'orange' ? 'border-l-orange-500' :
-                result?.riskColor === 'red' ? 'border-l-red-500' :
-                'border-l-primary'
+                result && result.dd2dScore > 0 && result.riskColor === 'green' ? 'border-l-green-500' :
+                result && result.dd2dScore > 0 && result.riskColor === 'orange' ? 'border-l-orange-500' :
+                result && result.dd2dScore > 0 && result.riskColor === 'red' ? 'border-l-red-500' :
+                'border-l-slate-300 dark:border-l-slate-600'
               }`}>
                 <div className="flex justify-between items-start mb-4">
                   <h4 className="font-bold text-slate-900 dark:text-white">20/2/20 Prediction</h4>
-                  {result && (
+                  {result && result.dd2dScore > 0 && (
                     <span className={`px-3 py-1 text-xs font-black uppercase tracking-wider rounded-full ${
                       result.riskColor === 'green' ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400' :
                       result.riskColor === 'orange' ? 'bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-400' :
@@ -131,18 +128,18 @@ function App() {
                     </span>
                   )}
                 </div>
-                {result ? (
+                {result && result.dd2dScore > 0 ? (
                   <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed mb-6">
                     According to the 20/2/20 model, the patient has an <span className={`font-bold ${
                       result.riskColor === 'green' ? 'text-green-600 dark:text-green-400' :
                       result.riskColor === 'orange' ? 'text-orange-600 dark:text-orange-400' :
                       result.riskColor === 'red' ? 'text-red-600 dark:text-red-400' :
                       'text-slate-900 dark:text-white'
-                    }`}>{result.riskLabel} (17.9%)</span> risk of progressing to multiple myeloma in two years.
+                    }`}>{result.riskLabel} ({(result.dd2dScore * 100).toFixed(1)}%)</span> risk of progressing to multiple myeloma in two years.
                   </p>
                 ) : (
-                  <p className="text-sm text-slate-500 text-center py-6">
-                    Prediction will appear here
+                  <p className="text-sm text-slate-500 dark:text-slate-500 text-center py-6">
+                    {result ? 'Provide bone marrow % to calculate the 20/2/20 score.' : 'Enter patient values and click Calculate Risk to see the prediction.'}
                   </p>
                 )}
                 <div className="flex items-center gap-2 text-[10px] text-slate-400 font-medium italic">
@@ -155,7 +152,7 @@ function App() {
               <div className="sm:col-span-2 md:col-span-2">
                 <RiskPredictionSummary
                   riskLabel={result?.riskLabel || ''}
-                  riskColor={result?.riskColor || 'orange'}
+                  riskColor={result?.riskColor || ''}
                   dd2dScore={result?.dd2dScore || 0}
                   riskSummary={result?.riskSummary || null}
                   historicalRiskSummary={historicalResult?.riskSummary || null}
@@ -165,12 +162,31 @@ function App() {
 
             {/* Progression Chart */}
             <ProgressionChart data={result?.progressionChart || null} />
+
           </div>
         </div>
       </main>
 
       <ResearchSection />
       <Footer />
+
+      {/* Floating Error Banner */}
+      {error && (
+        <div className="fixed bottom-0 left-0 right-0 z-50 w-full">
+          <div className="p-4 bg-red-50 dark:bg-red-900/95 border-t border-red-200 dark:border-red-700 shadow-xl flex items-center gap-3 max-w-7xl mx-auto w-full">
+            <span className="material-symbols-outlined text-red-500 dark:text-red-400 mt-0.5 shrink-0">error</span>
+            <div className="flex-1">
+              <p className="font-semibold text-red-700 dark:text-red-300 text-sm">Unable to calculate risk score</p>
+              <p className="text-red-600 dark:text-red-400 text-sm mt-0.5">
+                Please check that all required fields are filled in correctly and try again. If the problem persists, the service may be temporarily unavailable.
+              </p>
+            </div>
+            <button onClick={() => setError(null)} className="text-red-400 hover:text-red-600 dark:hover:text-red-300 shrink-0 transition-colors">
+              <span className="material-symbols-outlined text-lg">close</span>
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

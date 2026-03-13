@@ -9,17 +9,29 @@ interface RiskPredictionSummaryProps {
 }
 
 export function RiskPredictionSummary({
+  riskLabel,
+  riskColor,
   riskSummary,
   historicalRiskSummary,
 }: RiskPredictionSummaryProps) {
+  const borderColor = riskColor === 'green' ? 'border-l-green-500' :
+    riskColor === 'red' ? 'border-l-red-500' :
+    riskColor === 'orange' ? 'border-l-orange-500' :
+    'border-l-slate-300 dark:border-l-slate-600';
+
+  const badgeColor = riskColor === 'green' ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400' :
+    riskColor === 'red' ? 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400' :
+    riskColor === 'orange' ? 'bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-400' :
+    '';
+
   if (!riskSummary) {
     return (
-      <div className="bg-white dark:bg-slate-900 p-4 sm:p-6 rounded-2xl shadow-sm border-l-4 border-l-emerald-500 border border-slate-200 dark:border-slate-800">
+      <div className={`bg-white dark:bg-slate-900 p-4 sm:p-6 rounded-2xl shadow-sm border-l-4 ${borderColor} border border-slate-200 dark:border-slate-800`}>
         <div className="flex justify-between items-start mb-4">
           <h4 className="font-bold text-slate-900 dark:text-white">PANGEA Risk Prediction</h4>
         </div>
-        <p className="text-sm text-slate-500 text-center py-6">
-          Submit patient values to generate predictions
+        <p className="text-sm text-slate-500 dark:text-slate-500 text-center py-6">
+          Enter patient values and click Calculate Risk to see the prediction.
         </p>
       </div>
     );
@@ -32,16 +44,15 @@ export function RiskPredictionSummary({
     { label: '10 Years', value: riskSummary.year10 },
   ];
 
-  // Always show emerald for low risk as in the mock
-  const riskBgColor = 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400';
-
   return (
-    <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl shadow-sm border-l-4 border-l-emerald-500 border border-slate-200 dark:border-slate-800">
+    <div className={`bg-white dark:bg-slate-900 p-6 rounded-2xl shadow-sm border-l-4 ${borderColor} border border-slate-200 dark:border-slate-800`}>
       <div className="flex justify-between items-start mb-4">
         <h4 className="font-bold text-slate-900 dark:text-white">PANGEA Risk Prediction</h4>
-        <span className={`px-3 py-1 text-xs font-black uppercase tracking-wider rounded-full ${riskBgColor}`}>
-          Low Risk
-        </span>
+        {riskLabel && (
+          <span className={`px-3 py-1 text-xs font-black uppercase tracking-wider rounded-full ${badgeColor}`}>
+            {riskLabel}
+          </span>
+        )}
       </div>
       <div className="overflow-x-auto">
         <table className="w-full text-left text-sm">

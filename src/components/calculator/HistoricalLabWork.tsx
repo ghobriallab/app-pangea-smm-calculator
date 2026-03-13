@@ -37,12 +37,15 @@ export function HistoricalLabWork({
     setIsDialogOpen(true);
   };
 
-  const handleDialogSubmit = (date: string, inputs: PatientInputs) => {
+  const handleDialogSubmit = (date: string, rawDate: string, inputs: PatientInputs) => {
     const entry: HistoricalEntry = {
       date,
+      rawDate,
       mSpike: inputs.mSpike,
       sflcRatio: inputs.sflcRatio,
       age: inputs.age,
+      creatinine: inputs.creatinine,
+      hemoglobin: inputs.hemoglobin,
     };
 
     if (dialogMode === 'edit' && editingIndex !== null) {
@@ -133,12 +136,12 @@ export function HistoricalLabWork({
                 sflcRatio: entries[editingIndex].sflcRatio || 0,
                 age: entries[editingIndex].age || 0,
                 boneMarrow: 0,
-                creatinine: 0,
-                hemoglobin: 0,
+                creatinine: entries[editingIndex].creatinine || 0,
+                hemoglobin: entries[editingIndex].hemoglobin || 0,
               }
             : undefined
         }
-        initialDate={dialogMode === 'edit' && editingIndex !== null ? entries[editingIndex].date : undefined}
+        initialDate={dialogMode === 'edit' && editingIndex !== null ? entries[editingIndex].rawDate : undefined}
       />
     </>
   );

@@ -36,7 +36,10 @@ export interface PredictionResult {
 
 export interface HistoricalEntry {
   date: string;
+  rawDate: string;
   mSpike: number;
   sflcRatio?: number;
   age?: number;
+  creatinine?: number;
+  hemoglobin?: number;
 }
