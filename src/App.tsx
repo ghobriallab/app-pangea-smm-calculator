@@ -7,17 +7,11 @@ import { RiskPredictionSummary } from './components/calculator/RiskPredictionSum
 import { ProgressionChart } from './components/calculator/ProgressionChart';
 import { HistoricalLabWork } from './components/calculator/HistoricalLabWork';
 import { fetchPrediction } from './api/mockApi';
-import type { PatientInputs, PredictionResult, HistoricalEntry } from './types';
+import { useValidation } from './hooks/useValidation';
+import type { PredictionResult, HistoricalEntry } from './types';
 
 function App() {
-  const [inputs, setInputs] = useState<PatientInputs>({
-    mSpike: 0,
-    sflcRatio: 0,
-    boneMarrow: 0,
-    age: 0,
-    creatinine: 0,
-    hemoglobin: 0,
-  });
+  const validation = useValidation();
 
   const [result, setResult] = useState<PredictionResult | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -36,16 +30,15 @@ function App() {
   const [historicalEntries, setHistoricalEntries] = useState<HistoricalEntry[]>([]);
   const [historicalResult] = useState<PredictionResult | null>(null);
 
-  const handleInputChange = (field: keyof PatientInputs, value: number) => {
-    setInputs(prev => ({ ...prev, [field]: value }));
-  };
-
   const handleSubmit = async () => {
+    const isValid = validation.validateAll(validation.rawValues);
+    if (!isValid) return;
+
     setIsLoading(true);
     setError(null);
     setResult(null);
     try {
-      const prediction = await fetchPrediction(inputs, historicalEntries);
+      const prediction = await fetchPrediction(validation.getParsedInputs(), historicalEntries);
       setResult(prediction);
     } catch (err) {
       console.error('Prediction error:', err);
@@ -90,10 +83,13 @@ function App() {
           {/* Sidebar: Patient Values */}
           <aside className="lg:col-span-3 space-y-6">
             <PatientInputForm
-              inputs={inputs}
-              onInputChange={handleInputChange}
+              rawValues={validation.rawValues}
+              validationState={validation.validationState}
+              onInputChange={validation.handleChange}
+              onBlur={validation.handleBlur}
               onSubmit={handleSubmit}
               isLoading={isLoading}
+              hasErrors={validation.hasErrors}
             />
 
             {/* Historical Lab Work */}
@@ -101,7 +97,7 @@ function App() {
               entries={historicalEntries}
               onAddEntry={handleAddLabEntry}
               onDeleteEntry={handleDeleteLabEntry}
-              currentInputs={inputs}
+              currentInputs={validation.getParsedInputs()}
             />
           </aside>
 

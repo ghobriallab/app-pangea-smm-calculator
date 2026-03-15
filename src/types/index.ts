@@ -1,3 +1,22 @@
+export type ValidationSeverity = 'error' | 'warning';
+
+export interface FieldValidation {
+  severity: ValidationSeverity;
+  message: string;
+}
+
+export type ValidationState = Partial<Record<keyof PatientInputs, FieldValidation>>;
+
+export interface FieldRange {
+  min?: number;
+  max?: number;
+  warnLow?: number;
+  warnHigh?: number;
+  required?: boolean;
+  integer?: boolean;
+  label: string;
+}
+
 export interface PatientInputs {
   mSpike: number;
   sflcRatio: number;

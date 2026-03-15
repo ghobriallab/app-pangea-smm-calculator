@@ -1,17 +1,50 @@
-import type { PatientInputs } from '../../types';
+import type { PatientInputs, ValidationState } from '../../types';
 
 interface PatientInputFormProps {
-  inputs: PatientInputs;
-  onInputChange: (field: keyof PatientInputs, value: number) => void;
+  rawValues: Partial<Record<keyof PatientInputs, string>>;
+  validationState: ValidationState;
+  onInputChange: (field: keyof PatientInputs, value: string) => void;
+  onBlur: (field: keyof PatientInputs, value: string) => void;
   onSubmit: () => void;
   isLoading: boolean;
+  hasErrors: boolean;
+}
+
+function inputClass(severity: 'error' | 'warning' | undefined): string {
+  if (severity === 'error') return 'border-red-500 focus:ring-red-500/50 focus:border-red-500';
+  if (severity === 'warning') return 'border-amber-400 focus:ring-amber-400/50 focus:border-amber-400';
+  return 'border-slate-300 dark:border-slate-600 focus:ring-primary/50 focus:border-primary hover:border-slate-400 dark:hover:border-slate-500';
+}
+
+function ValidationMessage({ field, validationState }: { field: keyof PatientInputs; validationState: ValidationState }) {
+  const v = validationState[field];
+  if (!v) return null;
+  return (
+    <p
+      id={`${field}-validation`}
+      role="alert"
+      aria-live="polite"
+      className={`text-xs mt-1 flex items-center gap-0.5 ${v.severity === 'error' ? 'text-red-600 dark:text-red-400' : 'text-amber-600 dark:text-amber-500'}`}
+    >
+      {v.severity === 'warning' && (
+        <span className="material-symbols-outlined text-sm leading-none">warning</span>
+      )}
+      {v.severity === 'error' && (
+        <span className="material-symbols-outlined text-sm leading-none">error</span>
+      )}
+      {v.message}
+    </p>
+  );
 }
 
 export function PatientInputForm({
-  inputs,
+  rawValues,
+  validationState,
   onInputChange,
+  onBlur,
   onSubmit,
   isLoading,
+  hasErrors,
 }: PatientInputFormProps) {
   const fields = [
     { label: 'Serum Free Light Chain Ratio', key: 'sflcRatio' as const, placeholder: 'Enter ratio (e.g. 15.5)', required: true },
@@ -33,13 +66,15 @@ export function PatientInputForm({
             </span>
             <input
               type="number"
-              value={inputs[key] || ''}
-              onChange={(e) => onInputChange(key, parseFloat(e.target.value) || 0)}
+              value={rawValues[key] ?? ''}
+              onChange={(e) => onInputChange(key, e.target.value)}
+              onBlur={(e) => onBlur(key, e.target.value)}
               placeholder={placeholder}
-              required={required}
-              className="w-full px-3 py-2 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-lg text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:ring-2 focus:ring-primary/50 focus:border-primary focus:outline-none transition-all hover:border-slate-400 dark:hover:border-slate-500"
+              aria-describedby={validationState[key] ? `${key}-validation` : undefined}
+              className={`w-full px-3 py-2 bg-white dark:bg-slate-800 border rounded-lg text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:ring-2 focus:outline-none transition-all ${inputClass(validationState[key]?.severity)}`}
               disabled={isLoading}
             />
+            <ValidationMessage field={key} validationState={validationState} />
           </label>
         ))}
       </div>
@@ -53,19 +88,25 @@ export function PatientInputForm({
             </span>
             <input
               type="number"
-              value={inputs.boneMarrow || ''}
-              onChange={(e) => onInputChange('boneMarrow', parseFloat(e.target.value) || 0)}
+              value={rawValues.boneMarrow ?? ''}
+              onChange={(e) => onInputChange('boneMarrow', e.target.value)}
+              onBlur={(e) => onBlur('boneMarrow', e.target.value)}
               placeholder="e.g. 15"
-              className="w-full px-3 py-2 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-lg text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:ring-2 focus:ring-primary/50 focus:border-primary focus:outline-none transition-all hover:border-slate-400 dark:hover:border-slate-500"
+              aria-describedby={validationState.boneMarrow ? 'boneMarrow-validation' : undefined}
+              className={`w-full px-3 py-2 bg-white dark:bg-slate-800 border rounded-lg text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:ring-2 focus:outline-none transition-all ${inputClass(validationState.boneMarrow?.severity)}`}
               disabled={isLoading}
             />
+            <ValidationMessage field="boneMarrow" validationState={validationState} />
           </label>
         </div>
 
         <button
           onClick={onSubmit}
           disabled={isLoading}
-          className="w-full bg-primary text-white px-6 py-3 rounded-xl font-bold hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-primary/20"
+          aria-disabled={hasErrors}
+          className={`w-full bg-primary text-white px-6 py-3 rounded-xl font-bold hover:opacity-90 transition-opacity shadow-lg shadow-primary/20 ${
+            isLoading ? 'opacity-50 cursor-not-allowed' : hasErrors ? 'opacity-60' : ''
+          }`}
         >
           {isLoading ? 'Calculating...' : 'Calculate Risk'}
         </button>
