@@ -2,6 +2,13 @@ import type { PatientInputs, PredictionResult, HistoricalEntry } from '../types'
 
 const API_BASE = 'https://api.pangeamodels.org';
 
+export class ApiUnavailableError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = 'ApiUnavailableError';
+  }
+}
+
 function mapCategory(category: string): string {
   return category.toUpperCase() + ' RISK';
 }
@@ -33,23 +40,32 @@ export async function fetchPrediction(
     body.history = history!.map(entry => ({
       date: entry.rawDate,
       mSpike: entry.mSpike,
-      sflcRatio: entry.sflcRatio ?? null,
-      creatinine: entry.creatinine ?? null,
-      hemoglobin: entry.hemoglobin ?? null,
+      sflcRatio: entry.sflcRatio,
+      creatinine: entry.creatinine,
+      hemoglobin: entry.hemoglobin,
     }));
   }
 
   console.log(`[API] POST ${API_BASE}${endpoint}`, body);
 
-  const response = await fetch(`${API_BASE}${endpoint}`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(body),
-  });
+  let response: Response;
+  try {
+    response = await fetch(`${API_BASE}${endpoint}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    });
+  } catch (networkErr) {
+    console.error('[API] Network error:', networkErr);
+    throw new ApiUnavailableError('Network error: unable to reach the service.');
+  }
 
   if (!response.ok) {
     const text = await response.text();
     console.error(`[API] ${response.status} error:`, text);
+    if ([500, 502, 503, 504].includes(response.status)) {
+      throw new ApiUnavailableError(`Service unavailable (${response.status})`);
+    }
     throw new Error(`API error ${response.status}: ${text}`);
   }
 
@@ -63,11 +79,14 @@ export async function fetchPrediction(
   const score20220 = data.risk_20_2_20;
   const probs = pangea.probabilities;
   const category = v(pangea.category) as string;
+  const dd2dCategory = score20220?.category != null ? v(score20220.category) as string : '';
 
   return {
     riskLabel: mapCategory(category),
     riskColor: mapColor(category),
     dd2dScore: score20220?.reference_2yr_pct != null ? v(score20220.reference_2yr_pct) as number / 100 : 0,
+    dd2dLabel: dd2dCategory ? mapCategory(dd2dCategory) : '',
+    dd2dColor: dd2dCategory ? mapColor(dd2dCategory) : '',
     riskSummary: {
       year1: (v(probs.year_1.estimate) as number) * 100,
       year2: (v(probs.year_2.estimate) as number) * 100,

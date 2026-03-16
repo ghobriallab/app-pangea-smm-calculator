@@ -12,22 +12,43 @@ import type { ChartDataPoint } from '../../types';
 
 interface ProgressionChartProps {
   data: ChartDataPoint[] | null;
+  dynamicData?: ChartDataPoint[] | null;
+  riskColor?: string;
+  dynamicRiskColor?: string;
 }
 
 const PRIMARY_BLUE = '#6B8FC4';
 
-// Transform data so Recharts can render a CI band via stacked areas:
-// "lowerBase" = lower bound value (filled transparent)
-// "band" = upper - lower (the visible CI region on top)
-function transformForCIBand(data: ChartDataPoint[]) {
+function riskColorToHex(color: string | undefined): string {
+  if (color === 'green') return '#16a34a';   // text-green-600
+  if (color === 'red') return '#dc2626';     // text-red-600
+  if (color === 'orange') return '#ea580c';  // text-orange-600
+  return PRIMARY_BLUE;
+}
+
+function transformForCIBand(data: ChartDataPoint[], prefix = '') {
   return data.map((pt) => ({
-    ...pt,
-    lowerBase: pt.lower,
-    band: pt.upper - pt.lower,
+    year: pt.year,
+    [`${prefix}predicted`]: pt.predicted,
+    [`${prefix}lowerBase`]: pt.lower,
+    [`${prefix}band`]: pt.upper - pt.lower,
   }));
 }
 
-export function ProgressionChart({ data }: ProgressionChartProps) {
+// Merge static and dynamic arrays by year index
+function mergeChartData(
+  staticData: ChartDataPoint[],
+  dynamicData: ChartDataPoint[] | null | undefined,
+) {
+  const staticTransformed = transformForCIBand(staticData, '');
+  if (!dynamicData || dynamicData.length === 0) return staticTransformed;
+  const dynTransformed = transformForCIBand(dynamicData, 'dyn_');
+  return staticTransformed.map((pt, i) => ({ ...pt, ...(dynTransformed[i] ?? {}) }));
+}
+
+export function ProgressionChart({ data, dynamicData, riskColor, dynamicRiskColor }: ProgressionChartProps) {
+  const staticColor = riskColorToHex(riskColor);
+  const dynamicColor = riskColorToHex(dynamicRiskColor);
   if (!data || data.length === 0) {
     return (
       <div className="bg-white dark:bg-slate-900 p-4 sm:p-6 md:p-8 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800">
@@ -44,7 +65,8 @@ export function ProgressionChart({ data }: ProgressionChartProps) {
     );
   }
 
-  const chartData = transformForCIBand(data);
+  const chartData = mergeChartData(data, dynamicData);
+  const hasDynamic = !!dynamicData && dynamicData.length > 0;
 
   return (
     <div className="bg-white dark:bg-slate-900 p-4 sm:p-6 md:p-8 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800">
@@ -62,8 +84,12 @@ export function ProgressionChart({ data }: ProgressionChartProps) {
           <ComposedChart data={chartData} margin={{ top: 5, right: 10, left: -10, bottom: 5 }}>
             <defs>
               <linearGradient id="colorBand" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor={PRIMARY_BLUE} stopOpacity={0.2} />
-                <stop offset="95%" stopColor={PRIMARY_BLUE} stopOpacity={0.05} />
+                <stop offset="5%" stopColor={staticColor} stopOpacity={0.2} />
+                <stop offset="95%" stopColor={staticColor} stopOpacity={0.05} />
+              </linearGradient>
+              <linearGradient id="colorBandDyn" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="5%" stopColor={dynamicColor} stopOpacity={0.2} />
+                <stop offset="95%" stopColor={dynamicColor} stopOpacity={0.05} />
               </linearGradient>
             </defs>
             <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
@@ -77,52 +103,44 @@ export function ProgressionChart({ data }: ProgressionChartProps) {
             <YAxis domain={[0, 100]} tickFormatter={(v) => `${v}%`} />
             <Tooltip
               formatter={(value, name) => {
-                if (name === 'lowerBase' || name === 'band') return null;
+                if (['lowerBase', 'band', 'dyn_lowerBase', 'dyn_band'].includes(name as string)) return null;
                 return [`${(value as number).toFixed(1)}%`, name];
               }}
             />
-            {/* Transparent base up to lower CI bound */}
-            <Area
-              type="monotone"
-              dataKey="lowerBase"
-              stackId="ci"
-              fill="transparent"
-              stroke="none"
-              legendType="none"
-              tooltipType="none"
-              name="lowerBase"
-            />
-            {/* Visible CI band from lower to upper */}
-            <Area
-              type="monotone"
-              dataKey="band"
-              stackId="ci"
-              fill="url(#colorBand)"
-              stroke="none"
-              legendType="none"
-              tooltipType="none"
-              name="band"
-            />
-            <Line
-              type="monotone"
-              dataKey="predicted"
-              stroke={PRIMARY_BLUE}
-              strokeWidth={3}
-              name="Predicted"
-              dot={false}
-            />
+            {/* Static CI band */}
+            <Area type="monotone" dataKey="lowerBase" stackId="ci" fill="transparent" stroke="none" legendType="none" tooltipType="none" name="lowerBase" />
+            <Area type="monotone" dataKey="band" stackId="ci" fill="url(#colorBand)" stroke="none" legendType="none" tooltipType="none" name="band" />
+            {/* Static mean line */}
+            <Line type="monotone" dataKey="predicted" stroke={staticColor} strokeWidth={3} name="Baseline" dot={false} />
+            {/* Dynamic CI band */}
+            {hasDynamic && <Area type="monotone" dataKey="dyn_lowerBase" stackId="ci2" fill="transparent" stroke="none" legendType="none" tooltipType="none" name="dyn_lowerBase" />}
+            {hasDynamic && <Area type="monotone" dataKey="dyn_band" stackId="ci2" fill="url(#colorBandDyn)" stroke="none" legendType="none" tooltipType="none" name="dyn_band" />}
+            {/* Dynamic mean line */}
+            {hasDynamic && <Line type="monotone" dataKey="dyn_predicted" stroke={dynamicColor} strokeWidth={3} name="Complete" dot={false} strokeDasharray="6 3" />}
           </ComposedChart>
         </ResponsiveContainer>
       </div>
-      <div className="mt-4 sm:mt-6 md:mt-8 flex items-center justify-center gap-6">
+      <div className="mt-4 sm:mt-6 md:mt-8 flex flex-wrap items-center justify-center gap-4 sm:gap-6">
         <div className="flex items-center gap-2">
-          <span className="w-3 h-3 rounded-full bg-primary"></span>
-          <span className="text-xs font-semibold text-slate-600 dark:text-slate-400">Mean Prediction</span>
+          <svg width="24" height="10"><line x1="0" y1="5" x2="24" y2="5" stroke={staticColor} strokeWidth="3" /></svg>
+          <span className="text-xs font-semibold text-slate-600 dark:text-slate-400">Baseline Prediction</span>
         </div>
         <div className="flex items-center gap-2">
-          <span className="w-3 h-3 rounded-full bg-primary/20"></span>
-          <span className="text-xs font-semibold text-slate-600 dark:text-slate-400">95% Confidence Interval</span>
+          <span className="w-5 h-3 rounded-sm" style={{ backgroundColor: staticColor, opacity: 0.2 }}></span>
+          <span className="text-xs font-semibold text-slate-600 dark:text-slate-400">95% CI (Baseline)</span>
         </div>
+        {hasDynamic && (
+          <>
+            <div className="flex items-center gap-2">
+              <svg width="24" height="10"><line x1="0" y1="5" x2="24" y2="5" stroke={dynamicColor} strokeWidth="3" strokeDasharray="6 3" /></svg>
+              <span className="text-xs font-semibold text-slate-600 dark:text-slate-400">Complete Prediction</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="w-5 h-3 rounded-sm" style={{ backgroundColor: dynamicColor, opacity: 0.2 }}></span>
+              <span className="text-xs font-semibold text-slate-600 dark:text-slate-400">95% CI (Complete)</span>
+            </div>
+          </>
+        )}
       </div>
     </div>
   );

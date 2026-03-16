@@ -49,6 +49,8 @@ export interface PredictionResult {
   riskLabel: string;
   riskColor: string;
   dd2dScore: number;
+  dd2dLabel: string;
+  dd2dColor: string;
   riskSummary: RiskSummary;
   progressionChart: ChartDataPoint[];
 }
@@ -57,8 +59,8 @@ export interface HistoricalEntry {
   date: string;
   rawDate: string;
   mSpike: number;
-  sflcRatio?: number;
-  age?: number;
-  creatinine?: number;
-  hemoglobin?: number;
+  sflcRatio: number;
+  age: number;
+  creatinine: number;
+  hemoglobin: number;
 }
