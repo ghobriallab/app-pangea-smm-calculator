@@ -42,7 +42,7 @@ export function RiskPredictionSummary({
 
   if (!riskSummary) {
     return (
-      <div className={`bg-white dark:bg-slate-900 p-4 sm:p-6 rounded-2xl shadow-sm border-l-4 ${staticColors.border} border border-slate-200 dark:border-slate-800`}>
+      <div className={`bg-white dark:bg-slate-900 p-4 sm:p-6 rounded-2xl shadow-sm border-l-4 ${staticColors.border} border border-slate-200 dark:border-slate-800 h-full`}>
         <div className="flex justify-between items-start mb-4">
           <h4 className="font-bold text-slate-900 dark:text-white">PANGEA Risk Prediction</h4>
         </div>
@@ -61,7 +61,7 @@ export function RiskPredictionSummary({
   ];
 
   return (
-    <div className={`bg-white dark:bg-slate-900 p-6 rounded-2xl shadow-sm border-l-4 ${staticColors.border} border border-slate-200 dark:border-slate-800`}>
+    <div className={`bg-white dark:bg-slate-900 p-6 rounded-2xl shadow-sm border-l-4 ${staticColors.border} border border-slate-200 dark:border-slate-800 h-full`}>
       <div className="flex justify-between items-start mb-4">
         <h4 className="font-bold text-slate-900 dark:text-white">PANGEA Risk Prediction</h4>
       </div>

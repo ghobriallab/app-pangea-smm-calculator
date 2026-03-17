@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useMemo } from 'react';
-import { Navbar } from './components/layout/Navbar';
+import { Navbar, type Page } from './components/layout/Navbar';
 import { Footer } from './components/layout/Footer';
+import { WhatIsPangea } from './components/pages/WhatIsPangea';
 import { ResearchSection } from './components/layout/ResearchSection';
 import { PatientInputForm } from './components/calculator/PatientInputForm';
 import { RiskPredictionSummary } from './components/calculator/RiskPredictionSummary';
@@ -11,6 +12,7 @@ import { useValidation } from './hooks/useValidation';
 import type { PredictionResult, HistoricalEntry, PatientInputs } from './types';
 
 function App() {
+  const [currentPage, setCurrentPage] = useState<Page>('calculator');
   const validation = useValidation();
 
   const [result, setResult] = useState<PredictionResult | null>(null);
@@ -101,9 +103,11 @@ function App() {
       <div className="bg-amber-400 text-amber-900 text-center text-sm font-semibold py-2 px-4">
         ⚠ This tool is under active development and is not intended for clinical use.
       </div>
-      <Navbar />
+      <Navbar currentPage={currentPage} onNavigate={setCurrentPage} />
 
-      <main className="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full space-y-6">
+      {currentPage === 'what-is-pangea' && <WhatIsPangea />}
+
+      <main className={`flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full space-y-6${currentPage !== 'calculator' ? ' hidden' : ''}`}>
         {/* Hero Section */}
         <section className="mb-3 rounded-3xl overflow-hidden relative">
           <div className="absolute inset-0 bg-gradient-to-br from-primary/15 via-primary/5 to-transparent dark:from-primary/25 dark:via-primary/10 dark:to-transparent z-0"></div>
@@ -162,7 +166,7 @@ function App() {
                 : c === 'orange' ? 'text-orange-600 dark:text-orange-400'
                 : 'text-slate-900 dark:text-white';
               return (
-                <div className={`md:col-span-1 bg-white dark:bg-slate-900 p-6 rounded-2xl shadow-sm border-l-4 border border-slate-200 dark:border-slate-800 ${borderCls}`}>
+                <div className={`md:col-span-1 bg-white dark:bg-slate-900 p-6 rounded-2xl shadow-sm border-l-4 border border-slate-200 dark:border-slate-800 h-full flex flex-col ${borderCls}`}>
                   <div className="flex justify-between items-start mb-4">
                     <h4 className="font-bold text-slate-900 dark:text-white">20/2/20 Prediction</h4>
                     {result && result.dd2dScore > 0 && (
@@ -172,11 +176,11 @@ function App() {
                     )}
                   </div>
                   {result && result.dd2dScore > 0 ? (
-                    <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed mb-6">
+                    <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed mb-6 flex-1">
                       According to the 20/2/20 model, the patient has an <span className={`font-bold ${textCls}`}>{result.dd2dLabel} ({(result.dd2dScore * 100).toFixed(1)}%)</span> risk of progressing to multiple myeloma in two years.
                     </p>
                   ) : (
-                    <p className="text-sm text-slate-500 dark:text-slate-500 text-center py-6">
+                    <p className="text-sm text-slate-500 dark:text-slate-500 text-center py-6 flex-1">
                       {result ? 'Provide bone marrow % to calculate the 20/2/20 score.' : 'Enter patient values and click Calculate Risk to see the prediction.'}
                     </p>
                   )}
@@ -189,7 +193,7 @@ function App() {
             })()}
 
             {/* Risk Prediction Summary Card */}
-            <div className="sm:col-span-2 md:col-span-2">
+            <div className="sm:col-span-2 md:col-span-2 h-full">
               <RiskPredictionSummary
                 riskLabel={result?.riskLabel || ''}
                 riskColor={result?.riskColor || ''}
@@ -207,7 +211,7 @@ function App() {
         </div>
       </main>
 
-      <ResearchSection />
+      {currentPage === 'calculator' && <ResearchSection />}
       <Footer />
 
       {/* Floating Error Banner */}
