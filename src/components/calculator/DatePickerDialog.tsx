@@ -81,7 +81,7 @@ export function LabEntryDialog({
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-end sm:items-center justify-center z-50 px-0 sm:px-4">
-      <div className="bg-white dark:bg-slate-900 rounded-t-2xl sm:rounded-2xl shadow-lg p-4 sm:p-8 max-w-2xl w-full max-h-[90vh] overflow-y-auto overflow-x-hidden">
+      <div className="bg-white dark:bg-slate-900 rounded-t-2xl sm:rounded-2xl shadow-lg p-4 sm:p-8 w-full max-w-[100vw] sm:max-w-2xl max-h-[90vh] overflow-y-auto overflow-x-hidden">
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-lg font-bold text-slate-900 dark:text-white">
             {initialDate ? 'Edit Past Entry' : 'Add Past Entry'}
@@ -92,7 +92,7 @@ export function LabEntryDialog({
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-[repeat(auto-fill,minmax(160px,1fr))] gap-4">
           {/* Month/Year picker */}
-          <div className="sm:col-span-1">
+          <div>
             <label className="flex flex-col">
               <span className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1.5 h-8 flex items-end leading-tight">
                 Date (Month &amp; Year)<span className="text-red-500 ml-1">*</span>
@@ -102,7 +102,7 @@ export function LabEntryDialog({
                 value={selectedMonth}
                 onChange={(e) => setSelectedMonth(e.target.value)}
                 max={currentDate || undefined}
-                className={`w-full px-3 py-2 bg-white dark:bg-slate-800 border rounded-lg text-slate-900 dark:text-white focus:ring-2 focus:outline-none transition-all ${
+                className={`block min-w-0 w-full px-3 py-2 bg-white dark:bg-slate-800 border rounded-lg text-slate-900 dark:text-white focus:ring-2 focus:outline-none transition-all ${
                   dateError
                     ? 'border-red-500 focus:ring-red-500/50'
                     : 'border-slate-300 dark:border-slate-600 focus:ring-primary/50 focus:border-primary hover:border-slate-400 dark:hover:border-slate-500'

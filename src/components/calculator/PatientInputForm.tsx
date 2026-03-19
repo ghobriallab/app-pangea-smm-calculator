@@ -71,7 +71,7 @@ export function PatientInputForm({
       <h3 className="text-lg font-bold mb-4">Most Recent Patient Data</h3>
       <div className="grid grid-cols-2 sm:flex sm:flex-wrap gap-4 items-start">
         {/* Observation Date */}
-        <div className="sm:min-w-[120px] sm:max-w-[160px] sm:flex-1">
+        <div className="col-span-2 sm:col-span-1 sm:min-w-[120px] sm:max-w-[160px] sm:flex-1">
           <label className="block">
             <span className="text-sm font-semibold text-slate-700 dark:text-slate-300 flex items-end mb-1.5 h-8 leading-tight">
               Observation Date<span className="text-red-500 ml-1">*</span>
@@ -81,7 +81,7 @@ export function PatientInputForm({
               value={currentDate}
               onChange={(e) => onDateChange(e.target.value)}
               disabled={isLoading}
-              className="w-full px-3 py-2 bg-white dark:bg-slate-800 border rounded-lg text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:ring-2 focus:outline-none transition-all border-slate-300 dark:border-slate-600 focus:ring-primary/50 focus:border-primary hover:border-slate-400 dark:hover:border-slate-500"
+              className="block min-w-0 w-full px-3 py-2 bg-white dark:bg-slate-800 border rounded-lg text-slate-900 dark:text-white focus:ring-2 focus:outline-none transition-all border-slate-300 dark:border-slate-600 focus:ring-primary/50 focus:border-primary hover:border-slate-400 dark:hover:border-slate-500"
             />
           </label>
         </div>
