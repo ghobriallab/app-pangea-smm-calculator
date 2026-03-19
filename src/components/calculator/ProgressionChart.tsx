@@ -17,7 +17,7 @@ interface ProgressionChartProps {
   dynamicRiskColor?: string;
 }
 
-const PRIMARY_BLUE = '#6B8FC4';
+const PRIMARY_BLUE = '#2563EB';
 
 function riskColorToHex(color: string | undefined): string {
   if (color === 'green') return '#16a34a';   // text-green-600

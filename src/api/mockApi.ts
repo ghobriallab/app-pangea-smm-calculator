@@ -21,10 +21,14 @@ function mapColor(category: string): string {
 
 export async function fetchPrediction(
   inputs: PatientInputs,
+  currentDate: string,
   history?: HistoricalEntry[]
 ): Promise<PredictionResult> {
   const useDynamic = inputs.hemoglobin > 0 && history && history.length > 0;
   const endpoint = useDynamic ? '/calculate-score/dynamic' : '/calculate-score/static';
+
+  // currentDate is YYYY-MM; API expects YYYY-MM-DD
+  const currentDateFull = currentDate ? `${currentDate}-01` : new Date().toISOString().split('T')[0];
 
   const body: Record<string, unknown> = {
     mSpike: inputs.mSpike,
@@ -36,7 +40,7 @@ export async function fetchPrediction(
 
   if (useDynamic) {
     body.hemoglobin = inputs.hemoglobin;
-    body.currentDate = new Date().toISOString().split('T')[0];
+    body.currentDate = currentDateFull;
     body.history = history!.map(entry => ({
       date: entry.rawDate,
       mSpike: entry.mSpike,

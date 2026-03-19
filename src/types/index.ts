@@ -60,7 +60,6 @@ export interface HistoricalEntry {
   rawDate: string;
   mSpike: number;
   sflcRatio: number;
-  age: number;
   creatinine: number;
   hemoglobin: number;
 }

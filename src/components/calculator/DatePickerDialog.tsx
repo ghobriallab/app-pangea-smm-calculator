@@ -7,18 +7,18 @@ interface LabEntryDialogProps {
   onSubmit: (displayDate: string, rawDate: string, inputs: PatientInputs) => void;
   title?: string;
   initialInputs?: PatientInputs;
-  initialDate?: string;
-  currentAge?: number;
+  initialDate?: string; // YYYY-MM-DD stored in entry, we use YYYY-MM for the picker
+  currentDate: string; // YYYY-MM — most recent observation date for validation
 }
 
-function computeAgeAtDate(currentAge: number, labDateStr: string): number {
-  const today = new Date();
-  const labDate = new Date(labDateStr);
-  const yearDiff = today.getFullYear() - labDate.getFullYear();
-  const monthDiff = today.getMonth() - labDate.getMonth();
-  // subtract an extra year if we haven't yet reached that month/day this year
-  const adj = monthDiff < 0 || (monthDiff === 0 && today.getDate() < labDate.getDate()) ? 1 : 0;
-  return Math.max(0, currentAge - yearDiff + adj);
+function isDateInRange(selectedMonth: string, currentDate: string): boolean {
+  if (!selectedMonth || !currentDate) return false;
+  const [selYear, selMonth] = selectedMonth.split('-').map(Number);
+  const [curYear, curMonth] = currentDate.split('-').map(Number);
+  const selTotal = selYear * 12 + selMonth;
+  const curTotal = curYear * 12 + curMonth;
+  // must be strictly before current month and within 24 months
+  return selTotal < curTotal && curTotal - selTotal <= 24;
 }
 
 export function LabEntryDialog({
@@ -27,35 +27,23 @@ export function LabEntryDialog({
   onSubmit,
   initialInputs,
   initialDate,
-  currentAge,
+  currentDate,
 }: LabEntryDialogProps) {
-  const getInitialDate = () => {
-    if (initialDate) {
-      const date = new Date(initialDate);
-      return date.toISOString().split('T')[0];
-    }
-    return new Date().toISOString().split('T')[0];
+  const toMonthStr = (dateStr?: string) => {
+    if (!dateStr) return '';
+    return dateStr.substring(0, 7); // YYYY-MM
   };
 
-  const getInitialAge = (dateStr: string) => {
-    if (initialInputs?.age && initialInputs.age > 0) return initialInputs.age;
-    if (currentAge && currentAge > 0) return computeAgeAtDate(currentAge, dateStr);
-    return 0;
-  };
-
-  const initialDateStr = getInitialDate();
-  const [selectedDate, setSelectedDate] = useState(initialDateStr);
+  const [selectedMonth, setSelectedMonth] = useState(toMonthStr(initialDate));
   const [inputs, setInputs] = useState<PatientInputs>(
-    initialInputs
-      ? { ...initialInputs, age: getInitialAge(initialDateStr) }
-      : {
-          mSpike: 0,
-          sflcRatio: 0,
-          boneMarrow: 0,
-          age: currentAge && currentAge > 0 ? computeAgeAtDate(currentAge, initialDateStr) : 0,
-          creatinine: 0,
-          hemoglobin: 0,
-        }
+    initialInputs ?? {
+      mSpike: 0,
+      sflcRatio: 0,
+      boneMarrow: 0,
+      age: 0,
+      creatinine: 0,
+      hemoglobin: 0,
+    }
   );
 
   const fields = [
@@ -65,27 +53,27 @@ export function LabEntryDialog({
     { label: 'Hemoglobin (g/dL)', key: 'hemoglobin' as const, placeholder: 'e.g. 10.5', required: true },
   ];
 
-  const handleDateChange = (dateStr: string) => {
-    setSelectedDate(dateStr);
-    if (currentAge && currentAge > 0 && dateStr) {
-      setInputs(prev => ({ ...prev, age: computeAgeAtDate(currentAge, dateStr) }));
-    }
-  };
-
   const handleInputChange = (field: keyof PatientInputs, value: number) => {
     setInputs(prev => ({ ...prev, [field]: value }));
   };
 
-  const canSubmit = fields.every(f => !f.required || (inputs[f.key] ?? 0) > 0) && !!selectedDate;
+  const dateValid = isDateInRange(selectedMonth, currentDate);
+  const dateError = selectedMonth && !dateValid
+    ? 'Date must be within 2 years before the most recent observation date'
+    : null;
+
+  const canSubmit =
+    dateValid &&
+    fields.every(f => !f.required || (inputs[f.key] ?? 0) > 0);
 
   const handleSubmit = () => {
     if (!canSubmit) return;
-    const date = new Date(selectedDate);
-    const formattedDate = date.toLocaleDateString('en-US', {
+    const [year, month] = selectedMonth.split('-').map(Number);
+    const formattedDate = new Date(year, month - 1).toLocaleDateString('en-US', {
       year: 'numeric',
       month: 'long',
     });
-    onSubmit(formattedDate, selectedDate, inputs);
+    onSubmit(formattedDate, `${selectedMonth}-01`, inputs);
     onClose();
   };
 
@@ -95,35 +83,31 @@ export function LabEntryDialog({
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
       <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-lg p-5 sm:p-8 max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
         <div className="grid grid-cols-[repeat(auto-fill,minmax(160px,1fr))] gap-4">
-          {/* Date */}
+          {/* Month/Year picker */}
           <label className="flex flex-col">
             <span className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1.5 h-8 flex items-end leading-tight">
-              Date
+              Date (Month &amp; Year)<span className="text-red-500 ml-1">*</span>
             </span>
             <input
-              type="date"
-              value={selectedDate}
-              onChange={(e) => handleDateChange(e.target.value)}
-              className="w-full px-3 py-2 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-lg text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:ring-2 focus:ring-primary/50 focus:border-primary focus:outline-none transition-all hover:border-slate-400 dark:hover:border-slate-500"
+              type="month"
+              value={selectedMonth}
+              onChange={(e) => setSelectedMonth(e.target.value)}
+              max={currentDate || undefined}
+              className={`w-full px-3 py-2 bg-white dark:bg-slate-800 border rounded-lg text-slate-900 dark:text-white focus:ring-2 focus:outline-none transition-all ${
+                dateError
+                  ? 'border-red-500 focus:ring-red-500/50'
+                  : 'border-slate-300 dark:border-slate-600 focus:ring-primary/50 focus:border-primary hover:border-slate-400 dark:hover:border-slate-500'
+              }`}
             />
+            {dateError && (
+              <p className="text-xs text-red-600 dark:text-red-400 mt-1 flex items-center gap-0.5">
+                <span className="material-symbols-outlined text-sm leading-none">error</span>
+                {dateError}
+              </p>
+            )}
           </label>
 
-          {/* Age below Date */}
-          <label className="flex flex-col">
-            <span className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1.5 h-8 flex items-end leading-tight">
-              Age (years)<span className="text-red-500 ml-1">*</span>
-            </span>
-            <input
-              type="number"
-              value={inputs.age || ''}
-              onChange={(e) => handleInputChange('age', parseFloat(e.target.value) || 0)}
-              placeholder="65"
-              required
-              className="w-full px-3 py-2 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-lg text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:ring-2 focus:ring-primary/50 focus:border-primary focus:outline-none transition-all hover:border-slate-400 dark:hover:border-slate-500"
-            />
-          </label>
-
-          {/* Main Fields */}
+          {/* Main fields */}
           {fields.map(({ label, key, placeholder, required }) => (
             <label key={key} className="flex flex-col">
               <span className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1.5 h-8 flex items-end leading-tight">
@@ -140,20 +124,6 @@ export function LabEntryDialog({
               />
             </label>
           ))}
-
-          {/* Bone Marrow */}
-          <label className="flex flex-col">
-            <span className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1.5 h-8 flex items-end leading-tight">
-              Bone Marrow Biopsy (% Plasma Cells)
-            </span>
-            <input
-              type="number"
-              value={inputs.boneMarrow || ''}
-              onChange={(e) => handleInputChange('boneMarrow', parseFloat(e.target.value) || 0)}
-              placeholder="e.g. 15"
-              className="w-full px-3 py-2 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-lg text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:ring-2 focus:ring-primary/50 focus:border-primary focus:outline-none transition-all hover:border-slate-400 dark:hover:border-slate-500"
-            />
-          </label>
         </div>
 
         <div className="flex gap-3 mt-6">

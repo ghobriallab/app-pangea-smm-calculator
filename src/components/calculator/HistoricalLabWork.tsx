@@ -7,7 +7,7 @@ interface HistoricalLabWorkProps {
   onAddEntry: (entry: HistoricalEntry) => void;
   onDeleteEntry: (index: number) => void;
   onEditEntry: (index: number, entry: HistoricalEntry) => void;
-  currentInputs: PatientInputs;
+  currentDate: string;
 }
 
 export function HistoricalLabWork({
@@ -15,25 +15,17 @@ export function HistoricalLabWork({
   onAddEntry,
   onDeleteEntry,
   onEditEntry,
-  currentInputs,
+  currentDate,
 }: HistoricalLabWorkProps) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [dialogMode, setDialogMode] = useState<'add-current' | 'add-new' | 'edit'>('add-current');
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
 
-  const handleAddCurrent = () => {
-    setDialogMode('add-current');
-    setIsDialogOpen(true);
-  };
-
   const handleAddNew = () => {
-    setDialogMode('add-new');
     setEditingIndex(null);
     setIsDialogOpen(true);
   };
 
   const handleEditEntry = (index: number) => {
-    setDialogMode('edit');
     setEditingIndex(index);
     setIsDialogOpen(true);
   };
@@ -44,29 +36,33 @@ export function HistoricalLabWork({
       rawDate,
       mSpike: inputs.mSpike,
       sflcRatio: inputs.sflcRatio,
-      age: inputs.age,
       creatinine: inputs.creatinine,
       hemoglobin: inputs.hemoglobin,
     };
 
-    if (dialogMode === 'edit' && editingIndex !== null) {
+    if (editingIndex !== null) {
       onEditEntry(editingIndex, entry);
     } else {
       onAddEntry(entry);
     }
   };
 
+  const addButton = (
+    <button
+      onClick={handleAddNew}
+      className="shrink-0 flex items-center justify-center gap-1 w-full px-3 py-2 border-2 border-dashed border-slate-200 dark:border-slate-700 rounded-xl text-slate-500 text-sm font-bold hover:border-primary hover:text-primary transition-all"
+    >
+      <span className="material-symbols-outlined text-sm">add</span>
+      Add
+    </button>
+  );
+
   return (
     <>
       <div className="h-full bg-white dark:bg-slate-900 p-6 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 flex flex-col w-fit">
-        <h3 className="text-lg font-bold mb-4 shrink-0">Historical Lab Work</h3>
+        <h3 className="text-lg font-bold mb-4 shrink-0">Previous Patient Data</h3>
         {entries.length === 0 ? (
-          <button
-            onClick={handleAddCurrent}
-            className="w-full px-4 py-3 text-center text-slate-500 font-bold hover:text-primary transition-colors"
-          >
-            Add current values to history
-          </button>
+          addButton
         ) : (
           <>
             <div className="grid grid-cols-2 gap-2 mb-3 overflow-y-auto max-h-32 justify-items-start">
@@ -93,41 +89,33 @@ export function HistoricalLabWork({
                 </div>
               ))}
             </div>
-            <button
-              onClick={handleAddNew}
-              className="shrink-0 flex items-center justify-center gap-1 w-full px-3 py-2 border-2 border-dashed border-slate-200 dark:border-slate-700 rounded-xl text-slate-500 text-sm font-bold hover:border-primary hover:text-primary transition-all"
-            >
-              <span className="material-symbols-outlined text-sm">add</span>
-              Add
-            </button>
+            {addButton}
           </>
         )}
       </div>
 
       <LabEntryDialog
-        key={isDialogOpen ? `${dialogMode}-${editingIndex ?? 'new'}` : 'closed'}
+        key={isDialogOpen ? `${editingIndex ?? 'new'}` : 'closed'}
         isOpen={isDialogOpen}
         onClose={() => {
           setIsDialogOpen(false);
           setEditingIndex(null);
         }}
         onSubmit={handleDialogSubmit}
-        currentAge={currentInputs.age > 0 ? currentInputs.age : undefined}
+        currentDate={currentDate}
         initialInputs={
-          dialogMode === 'add-current'
-            ? currentInputs
-            : dialogMode === 'edit' && editingIndex !== null
+          editingIndex !== null
             ? {
                 mSpike: entries[editingIndex].mSpike,
                 sflcRatio: entries[editingIndex].sflcRatio,
-                age: entries[editingIndex].age,
+                age: 0,
                 boneMarrow: 0,
                 creatinine: entries[editingIndex].creatinine,
                 hemoglobin: entries[editingIndex].hemoglobin,
               }
             : undefined
         }
-        initialDate={dialogMode === 'edit' && editingIndex !== null ? entries[editingIndex].rawDate : undefined}
+        initialDate={editingIndex !== null ? entries[editingIndex].rawDate : undefined}
       />
     </>
   );

@@ -10,6 +10,8 @@ interface PatientInputFormProps {
   hasErrors: boolean;
   buttonLabel: string;
   isDisabled: boolean;
+  currentDate: string;
+  onDateChange: (date: string) => void;
 }
 
 function inputClass(severity: 'error' | 'warning' | undefined): string {
@@ -51,6 +53,8 @@ export function PatientInputForm({
   hasErrors,
   buttonLabel,
   isDisabled,
+  currentDate,
+  onDateChange,
 }: PatientInputFormProps) {
   const fields = [
     { label: 'Age (years)', key: 'age' as const, placeholder: '65', required: true },
@@ -62,8 +66,23 @@ export function PatientInputForm({
 
   return (
     <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800">
-      <h3 className="text-lg font-bold mb-4">Current Patient Values</h3>
+      <h3 className="text-lg font-bold mb-4">Most Recent Patient Data</h3>
       <div className="flex flex-wrap gap-4 items-start">
+        {/* Observation Date */}
+        <div className="min-w-[120px] max-w-[160px] flex-1">
+          <label className="block">
+            <span className="text-sm font-semibold text-slate-700 dark:text-slate-300 flex items-end mb-1.5 h-8 leading-tight">
+              Observation Date<span className="text-red-500 ml-1">*</span>
+            </span>
+            <input
+              type="month"
+              value={currentDate}
+              onChange={(e) => onDateChange(e.target.value)}
+              disabled={isLoading}
+              className="w-full px-3 py-2 bg-white dark:bg-slate-800 border rounded-lg text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:ring-2 focus:outline-none transition-all border-slate-300 dark:border-slate-600 focus:ring-primary/50 focus:border-primary hover:border-slate-400 dark:hover:border-slate-500"
+            />
+          </label>
+        </div>
         {fields.map(({ label, key, placeholder, required }) => (
           <div key={key} className="min-w-[120px] max-w-[160px] flex-1">
             <label className="block">

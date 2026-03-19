@@ -34,6 +34,7 @@ function App() {
     };
   }, [error, isUnavailableError]);
   const [historicalEntries, setHistoricalEntries] = useState<HistoricalEntry[]>([]);
+  const [currentDate, setCurrentDate] = useState<string>('');
 
   const handleSubmit = async () => {
     const isValid = validation.validateAll(validation.rawValues);
@@ -48,8 +49,8 @@ function App() {
       const inputs = validation.getParsedInputs();
       const hasDynamic = inputs.hemoglobin > 0 && historicalEntries.length > 0;
       const [staticPrediction, dynPrediction] = await Promise.all([
-        fetchPrediction(inputs),
-        hasDynamic ? fetchPrediction(inputs, historicalEntries) : Promise.resolve(null),
+        fetchPrediction(inputs, currentDate),
+        hasDynamic ? fetchPrediction(inputs, currentDate, historicalEntries) : Promise.resolve(null),
       ]);
       setResult(staticPrediction);
       setDynamicResult(dynPrediction);
@@ -135,6 +136,8 @@ function App() {
               hasErrors={validation.hasErrors}
               buttonLabel={buttonLabel}
               isDisabled={!hasChangedSinceLastCalc && result !== null}
+              currentDate={currentDate}
+              onDateChange={setCurrentDate}
             />
           </div>
           <div className="lg:w-fit flex flex-col">
@@ -143,7 +146,7 @@ function App() {
               onAddEntry={handleAddLabEntry}
               onDeleteEntry={handleDeleteLabEntry}
               onEditEntry={handleEditLabEntry}
-              currentInputs={validation.getParsedInputs()}
+              currentDate={currentDate}
             />
           </div>
         </div>
