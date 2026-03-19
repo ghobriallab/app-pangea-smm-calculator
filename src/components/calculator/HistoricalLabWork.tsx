@@ -59,7 +59,7 @@ export function HistoricalLabWork({
 
   return (
     <>
-      <div className="h-full bg-white dark:bg-slate-900 p-6 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 flex flex-col w-fit">
+      <div className="h-full bg-white dark:bg-slate-900 p-6 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 flex flex-col w-full lg:w-fit">
         <h3 className="text-lg font-bold mb-4 shrink-0">Previous Patient Data</h3>
         {entries.length === 0 ? (
           addButton

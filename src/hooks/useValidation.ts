@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import type { PatientInputs, ValidationState } from '../types';
 import { FIELD_RANGES } from '../validation/fieldRanges';
 import { validateField } from '../validation/validateField';
@@ -9,12 +9,19 @@ export function useValidation() {
   const [rawValues, setRawValues] = useState<RawValues>({});
   const [touched, setTouched] = useState<Partial<Record<keyof PatientInputs, boolean>>>({});
   const [validationState, setValidationState] = useState<ValidationState>({});
+  const [requireHemoglobin, setRequireHemoglobin] = useState(false);
+
+  const getRange = useCallback((field: keyof PatientInputs) => {
+    return field === 'hemoglobin' && requireHemoglobin
+      ? { ...FIELD_RANGES[field], required: true }
+      : FIELD_RANGES[field];
+  }, [requireHemoglobin]);
 
   const handleChange = useCallback((field: keyof PatientInputs, rawValue: string) => {
     setRawValues(prev => ({ ...prev, [field]: rawValue }));
     setTouched(prev => {
       if (!prev[field]) return prev;
-      const result = validateField(rawValue, FIELD_RANGES[field]);
+      const result = validateField(rawValue, getRange(field));
       setValidationState(vs => {
         const next = { ...vs };
         if (result) next[field] = result;
@@ -23,20 +30,42 @@ export function useValidation() {
       });
       return prev;
     });
-  }, []);
+  }, [getRange]);
 
   const handleBlur = useCallback((field: keyof PatientInputs, rawValue: string) => {
     setTouched(prev => ({ ...prev, [field]: true }));
-    const result = validateField(rawValue, FIELD_RANGES[field]);
+    const result = validateField(rawValue, getRange(field));
     setValidationState(vs => {
       const next = { ...vs };
       if (result) next[field] = result;
       else delete next[field];
       return next;
     });
-  }, []);
+  }, [getRange]);
 
-  const validateAll = useCallback((currentRawValues: RawValues): boolean => {
+  // Re-validate hemoglobin immediately when its required status changes
+  useEffect(() => {
+    setTouched(prev => {
+      if (!prev['hemoglobin']) return prev;
+      setRawValues(currentRaw => {
+        const raw = currentRaw['hemoglobin'] ?? '';
+        const range = requireHemoglobin
+          ? { ...FIELD_RANGES['hemoglobin'], required: true }
+          : FIELD_RANGES['hemoglobin'];
+        const result = validateField(raw, range);
+        setValidationState(vs => {
+          const next = { ...vs };
+          if (result) next['hemoglobin'] = result;
+          else delete next['hemoglobin'];
+          return next;
+        });
+        return currentRaw;
+      });
+      return prev;
+    });
+  }, [requireHemoglobin]);
+
+  const validateAll = useCallback((currentRawValues: RawValues, requireHemoglobin = false): boolean => {
     const newState: ValidationState = {};
     const newTouched: Partial<Record<keyof PatientInputs, boolean>> = {};
     let hasErrors = false;
@@ -44,7 +73,10 @@ export function useValidation() {
     for (const field of Object.keys(FIELD_RANGES) as (keyof PatientInputs)[]) {
       newTouched[field] = true;
       const raw = currentRawValues[field] ?? '';
-      const result = validateField(raw, FIELD_RANGES[field]);
+      const range = field === 'hemoglobin' && requireHemoglobin
+        ? { ...FIELD_RANGES[field], required: true }
+        : FIELD_RANGES[field];
+      const result = validateField(raw, range);
       if (result) {
         newState[field] = result;
         if (result.severity === 'error') hasErrors = true;
@@ -79,5 +111,6 @@ export function useValidation() {
     validateAll,
     getParsedInputs,
     hasErrors,
+    setRequireHemoglobin,
   };
 }

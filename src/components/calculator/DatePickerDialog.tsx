@@ -80,32 +80,42 @@ export function LabEntryDialog({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-      <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-lg p-5 sm:p-8 max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
-        <div className="grid grid-cols-[repeat(auto-fill,minmax(160px,1fr))] gap-4">
+    <div className="fixed inset-0 bg-black/50 flex items-end sm:items-center justify-center z-50 px-0 sm:px-4">
+      <div className="bg-white dark:bg-slate-900 rounded-t-2xl sm:rounded-2xl shadow-lg p-4 sm:p-8 max-w-2xl w-full max-h-[90vh] overflow-y-auto overflow-x-hidden">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-lg font-bold text-slate-900 dark:text-white">
+            {initialDate ? 'Edit Past Entry' : 'Add Past Entry'}
+          </h3>
+          <button onClick={onClose} className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors">
+            <span className="material-symbols-outlined">close</span>
+          </button>
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-[repeat(auto-fill,minmax(160px,1fr))] gap-4">
           {/* Month/Year picker */}
-          <label className="flex flex-col">
-            <span className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1.5 h-8 flex items-end leading-tight">
-              Date (Month &amp; Year)<span className="text-red-500 ml-1">*</span>
-            </span>
-            <input
-              type="month"
-              value={selectedMonth}
-              onChange={(e) => setSelectedMonth(e.target.value)}
-              max={currentDate || undefined}
-              className={`w-full px-3 py-2 bg-white dark:bg-slate-800 border rounded-lg text-slate-900 dark:text-white focus:ring-2 focus:outline-none transition-all ${
-                dateError
-                  ? 'border-red-500 focus:ring-red-500/50'
-                  : 'border-slate-300 dark:border-slate-600 focus:ring-primary/50 focus:border-primary hover:border-slate-400 dark:hover:border-slate-500'
-              }`}
-            />
-            {dateError && (
-              <p className="text-xs text-red-600 dark:text-red-400 mt-1 flex items-center gap-0.5">
-                <span className="material-symbols-outlined text-sm leading-none">error</span>
-                {dateError}
-              </p>
-            )}
-          </label>
+          <div className="sm:col-span-1">
+            <label className="flex flex-col">
+              <span className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1.5 h-8 flex items-end leading-tight">
+                Date (Month &amp; Year)<span className="text-red-500 ml-1">*</span>
+              </span>
+              <input
+                type="month"
+                value={selectedMonth}
+                onChange={(e) => setSelectedMonth(e.target.value)}
+                max={currentDate || undefined}
+                className={`w-full px-3 py-2 bg-white dark:bg-slate-800 border rounded-lg text-slate-900 dark:text-white focus:ring-2 focus:outline-none transition-all ${
+                  dateError
+                    ? 'border-red-500 focus:ring-red-500/50'
+                    : 'border-slate-300 dark:border-slate-600 focus:ring-primary/50 focus:border-primary hover:border-slate-400 dark:hover:border-slate-500'
+                }`}
+              />
+              {dateError && (
+                <p className="text-xs text-red-600 dark:text-red-400 mt-1 flex items-start gap-0.5">
+                  <span className="material-symbols-outlined text-sm leading-none shrink-0">error</span>
+                  {dateError}
+                </p>
+              )}
+            </label>
+          </div>
 
           {/* Main fields */}
           {fields.map(({ label, key, placeholder, required }) => (

@@ -37,7 +37,7 @@ function App() {
   const [currentDate, setCurrentDate] = useState<string>('');
 
   const handleSubmit = async () => {
-    const isValid = validation.validateAll(validation.rawValues);
+    const isValid = validation.validateAll(validation.rawValues, historicalEntries.length > 0);
     if (!isValid) return;
 
     setIsLoading(true);
@@ -71,11 +71,19 @@ function App() {
   };
 
   const handleAddLabEntry = (entry: HistoricalEntry) => {
-    setHistoricalEntries(prev => [entry, ...prev]);
+    setHistoricalEntries(prev => {
+      const next = [entry, ...prev];
+      validation.setRequireHemoglobin(next.length > 0);
+      return next;
+    });
   };
 
   const handleDeleteLabEntry = (index: number) => {
-    setHistoricalEntries(prev => prev.filter((_, i) => i !== index));
+    setHistoricalEntries(prev => {
+      const next = prev.filter((_, i) => i !== index);
+      validation.setRequireHemoglobin(next.length > 0);
+      return next;
+    });
   };
 
   const handleEditLabEntry = (index: number, entry: HistoricalEntry) => {
@@ -138,9 +146,10 @@ function App() {
               isDisabled={!hasChangedSinceLastCalc && result !== null}
               currentDate={currentDate}
               onDateChange={setCurrentDate}
+              hasHistoricalEntries={historicalEntries.length > 0}
             />
           </div>
-          <div className="lg:w-fit flex flex-col">
+          <div className="w-full lg:w-fit flex flex-col">
             <HistoricalLabWork
               entries={historicalEntries}
               onAddEntry={handleAddLabEntry}

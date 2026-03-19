@@ -12,6 +12,7 @@ interface PatientInputFormProps {
   isDisabled: boolean;
   currentDate: string;
   onDateChange: (date: string) => void;
+  hasHistoricalEntries: boolean;
 }
 
 function inputClass(severity: 'error' | 'warning' | undefined): string {
@@ -55,21 +56,22 @@ export function PatientInputForm({
   isDisabled,
   currentDate,
   onDateChange,
+  hasHistoricalEntries,
 }: PatientInputFormProps) {
   const fields = [
     { label: 'Age (years)', key: 'age' as const, placeholder: '65', required: true },
     { label: 'Serum Free Light Chain Ratio', key: 'sflcRatio' as const, placeholder: 'Enter ratio (e.g. 15.5)', required: true },
     { label: 'M-Spike (g/dL)', key: 'mSpike' as const, placeholder: 'e.g. 3.0', required: true },
     { label: 'Creatinine (mg/dL)', key: 'creatinine' as const, placeholder: 'e.g. 1.2', required: true },
-    { label: 'Hemoglobin (g/dL)', key: 'hemoglobin' as const, placeholder: 'e.g. 10.5', required: false },
+    { label: 'Hemoglobin (g/dL)', key: 'hemoglobin' as const, placeholder: 'e.g. 10.5', required: hasHistoricalEntries },
   ];
 
   return (
     <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800">
       <h3 className="text-lg font-bold mb-4">Most Recent Patient Data</h3>
-      <div className="flex flex-wrap gap-4 items-start">
+      <div className="grid grid-cols-2 sm:flex sm:flex-wrap gap-4 items-start">
         {/* Observation Date */}
-        <div className="min-w-[120px] max-w-[160px] flex-1">
+        <div className="sm:min-w-[120px] sm:max-w-[160px] sm:flex-1">
           <label className="block">
             <span className="text-sm font-semibold text-slate-700 dark:text-slate-300 flex items-end mb-1.5 h-8 leading-tight">
               Observation Date<span className="text-red-500 ml-1">*</span>
@@ -84,7 +86,7 @@ export function PatientInputForm({
           </label>
         </div>
         {fields.map(({ label, key, placeholder, required }) => (
-          <div key={key} className="min-w-[120px] max-w-[160px] flex-1">
+          <div key={key} className="sm:min-w-[120px] sm:max-w-[160px] sm:flex-1">
             <label className="block">
               <span className="text-sm font-semibold text-slate-700 dark:text-slate-300 flex items-end mb-1.5 h-8 leading-tight">
                 {label}
@@ -110,7 +112,7 @@ export function PatientInputForm({
         ))}
 
         {/* Bone Marrow field inline */}
-        <div className="min-w-[120px] max-w-[160px] flex-1">
+        <div className="sm:min-w-[120px] sm:max-w-[160px] sm:flex-1">
           <label className="block">
             <span className="text-sm font-semibold text-slate-700 dark:text-slate-300 flex items-end mb-1.5 h-8 leading-tight">
               Bone Marrow (% Plasma Cells)
@@ -133,7 +135,7 @@ export function PatientInputForm({
           </label>
         </div>
         {/* Calculate button aligned with inputs */}
-        <div className="ml-auto flex-shrink-0 self-end">
+        <div className="col-span-2 sm:col-span-1 sm:ml-auto flex-shrink-0 self-end">
           <button
             onClick={onSubmit}
             disabled={isLoading || isDisabled}
