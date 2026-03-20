@@ -13,6 +13,7 @@ interface PatientInputFormProps {
   currentDate: string;
   onDateChange: (date: string) => void;
   hasHistoricalEntries: boolean;
+  showHemoglobinNotUsedWarning: boolean;
 }
 
 function inputClass(severity: 'error' | 'warning' | undefined): string {
@@ -57,6 +58,7 @@ export function PatientInputForm({
   currentDate,
   onDateChange,
   hasHistoricalEntries,
+  showHemoglobinNotUsedWarning,
 }: PatientInputFormProps) {
   const fields = [
     { label: 'Age (years)', key: 'age' as const, placeholder: '65', required: true },
@@ -73,8 +75,8 @@ export function PatientInputForm({
         {/* Observation Date */}
         <div className="col-span-2 sm:col-span-1 sm:min-w-[120px] sm:max-w-[160px] sm:flex-1">
           <label className="block">
-            <span className="text-sm font-semibold text-slate-700 dark:text-slate-300 flex items-end mb-1.5 h-8 leading-tight">
-              Observation Date<span className="text-red-500 ml-1">*</span>
+            <span className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1.5 h-8 leading-tight flex items-end">
+              <span>Observation Date<span className="text-red-500">*</span></span>
             </span>
             <div className="relative overflow-hidden rounded-lg">
               <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 material-symbols-outlined text-slate-400 dark:text-slate-500 text-lg z-10">calendar_month</span>
@@ -92,9 +94,8 @@ export function PatientInputForm({
         {fields.map(({ label, key, placeholder, required }) => (
           <div key={key} className="sm:min-w-[120px] sm:max-w-[160px] sm:flex-1">
             <label className="block">
-              <span className="text-sm font-semibold text-slate-700 dark:text-slate-300 flex items-end mb-1.5 h-8 leading-tight">
-                {label}
-                {required && <span className="text-red-500 ml-1">*</span>}
+              <span className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1.5 h-8 leading-tight flex items-end">
+                <span>{label}{required && <span className="text-red-500">*</span>}</span>
               </span>
               <div className="relative">
                 <input
@@ -108,12 +109,13 @@ export function PatientInputForm({
                   disabled={isLoading}
                 />
                 <div className="absolute top-full left-0 w-full pt-0.5">
-                  <ValidationMessage field={key} validationState={validationState} />
-                  {key === 'hemoglobin' && !hasHistoricalEntries && rawValues.hemoglobin && rawValues.hemoglobin.trim() !== '' && !validationState.hemoglobin && (
-                    <p className="text-xs mt-0.5 flex items-center gap-0.5 text-amber-600 dark:text-amber-500">
+                  {key === 'hemoglobin' && showHemoglobinNotUsedWarning ? (
+                    <p className="text-xs mt-1 flex items-center gap-0.5 text-amber-600 dark:text-amber-500">
                       <span className="material-symbols-outlined text-sm leading-none">info</span>
-                      Only used with historical lab entries
+                      Hemoglobin was not used — it requires historical lab entries
                     </p>
+                  ) : (
+                    <ValidationMessage field={key} validationState={validationState} />
                   )}
                 </div>
               </div>
@@ -124,8 +126,8 @@ export function PatientInputForm({
         {/* Bone Marrow field inline */}
         <div className="sm:min-w-[120px] sm:max-w-[160px] sm:flex-1">
           <label className="block">
-            <span className="text-sm font-semibold text-slate-700 dark:text-slate-300 flex items-end mb-1.5 h-8 leading-tight">
-              Bone Marrow (% Plasma Cells)
+            <span className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1.5 h-8 leading-tight flex items-end">
+              <span>Bone Marrow (% Plasma Cells)</span>
             </span>
             <div className="relative">
               <input

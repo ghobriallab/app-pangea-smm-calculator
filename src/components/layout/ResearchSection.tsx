@@ -23,7 +23,7 @@ export function ResearchSection() {
             <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed mb-6">
               The PROMISE Study is a national effort to test people who are at higher risks of MGUS, SMM, and multiple myeloma. The goal of the PROMISE Study is to identify & understand why some people develop them while others do not.
             </p>
-            <a href="#" className="text-sm font-bold text-primary hover:underline">
+            <a href="https://www.promisestudy.org" target="_blank" rel="noopener noreferrer" className="text-sm font-bold text-primary hover:underline">
               Learn more at www.promisestudy.org →
             </a>
           </div>
@@ -37,31 +37,12 @@ export function ResearchSection() {
             <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed mb-6">
               The PCROWD Study is a national effort to collect data from patients with MGUS or SMM. The goal is to understand why some people develop these conditions & why some patients with MGUS or SMM develop multiple myeloma others do not.
             </p>
-            <a href="#" className="text-sm font-bold text-primary hover:underline">
+            <a href="https://www.pcrowd.org" target="_blank" rel="noopener noreferrer" className="text-sm font-bold text-primary hover:underline">
               Learn more at www.pcrowd.org →
             </a>
           </div>
         </div>
 
-        {/* Dana-Farber Logo and Credits */}
-        <div className="text-center border-t border-slate-200 dark:border-slate-700 pt-8">
-          <div className="flex justify-center mb-4">
-            <img src="/dfci-logo.avif" alt="Dana-Farber Cancer Institute" className="h-12" />
-          </div>
-          <p className="text-xs text-slate-500 dark:text-slate-400 mb-3">
-            Research and development of the PANGEA Models by Floris Chabrun, PharmD, PhD, Annie Cowan, MD, Federico Ferrari, PhD, Susanna Gentile, PhD, and Daniel Schwartz, PhD.
-          </p>
-          <p className="text-xs text-slate-500 dark:text-slate-400 mb-3">
-            Leadership provided by Irene Ghobrial, MD and Lorenzo Trippa, PhD.
-          </p>
-          <p className="text-xs text-slate-500 dark:text-slate-400 max-w-3xl mx-auto">
-            To learn more about the PANGEA Models, please read our publication in{' '}
-            <a className="font-bold text-primary hover:underline" href="https://www.nature.com/nm/" target="_blank" rel="noopener noreferrer">Nature Medicine</a>.
-          </p>
-          <p className="text-xs text-slate-400 dark:text-slate-500 mt-4">
-            © 2026 by the Ghobrial Lab | Dana-Farber Cancer Institute | Boston, MA | USA
-          </p>
-        </div>
       </div>
     </section>
   );

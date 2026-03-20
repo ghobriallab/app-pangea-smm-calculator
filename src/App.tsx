@@ -22,6 +22,7 @@ function App() {
   const [isUnavailableError, setIsUnavailableError] = useState(false);
   const [lastCalculatedInputs, setLastCalculatedInputs] = useState<PatientInputs | null>(null);
   const [lastCalculatedEntries, setLastCalculatedEntries] = useState<HistoricalEntry[]>([]);
+  const [showHemoglobinNotUsedWarning, setShowHemoglobinNotUsedWarning] = useState(false);
   const errorTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
@@ -56,6 +57,7 @@ function App() {
       setDynamicResult(dynPrediction);
       setLastCalculatedInputs(inputs);
       setLastCalculatedEntries([...historicalEntries]);
+      setShowHemoglobinNotUsedWarning(inputs.hemoglobin > 0 && historicalEntries.length === 0);
     } catch (err) {
       console.error('Prediction error:', err);
       if (err instanceof ApiUnavailableError) {
@@ -70,7 +72,16 @@ function App() {
     }
   };
 
+  // Clear hemoglobin "not used" warning when hemoglobin value changes
+  const handleInputChange = (field: keyof PatientInputs, value: string) => {
+    if (field === 'hemoglobin') {
+      setShowHemoglobinNotUsedWarning(false);
+    }
+    validation.handleChange(field, value);
+  };
+
   const handleAddLabEntry = (entry: HistoricalEntry) => {
+    setShowHemoglobinNotUsedWarning(false);
     setHistoricalEntries(prev => {
       const next = [entry, ...prev];
       validation.setRequireHemoglobin(next.length > 0);
@@ -125,7 +136,7 @@ function App() {
               Welcome to the PANGEA-SMM Calculator
             </h1>
             <p className="text-sm sm:text-base lg:text-lg text-slate-600 dark:text-slate-400 mb-2 leading-relaxed">
-              The PANGEA-SMM Model predicts your risk of progression from SMM to multiple myeloma.
+              The PANGEA-SMM Model predicts your risk of progression from <a href="https://www.cancer.org/cancer/types/multiple-myeloma/about/what-is-multiple-myeloma.html" target="_blank" rel="noopener noreferrer" className="font-semibold text-primary hover:underline">Smoldering Multiple Myeloma (SMM)</a> to active multiple myeloma.
               The clinical gold-standard calculator for 20-2-20 criteria is also integrated below for comprehensive assessment.
             </p>
             <a href="https://www.nature.com/articles/s41591-026-04304-x" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 text-sm font-semibold text-primary hover:underline">
@@ -141,7 +152,7 @@ function App() {
             <PatientInputForm
               rawValues={validation.rawValues}
               validationState={validation.validationState}
-              onInputChange={validation.handleChange}
+              onInputChange={handleInputChange}
               onBlur={validation.handleBlur}
               onSubmit={handleSubmit}
               isLoading={isLoading}
@@ -151,6 +162,7 @@ function App() {
               currentDate={currentDate}
               onDateChange={setCurrentDate}
               hasHistoricalEntries={historicalEntries.length > 0}
+              showHemoglobinNotUsedWarning={showHemoglobinNotUsedWarning}
             />
           </div>
           <div className="w-full lg:w-fit flex flex-col">
@@ -202,7 +214,7 @@ function App() {
                   )}
                   <div className="flex items-center gap-2 text-[10px] text-slate-400 font-medium italic">
                     <span className="material-symbols-outlined text-sm">menu_book</span>
-                    Ref: Mayo Clinic Proceedings (2020)
+                    Ref: <a href="https://www.nature.com/articles/s41408-020-00366-3" target="_blank" rel="noopener noreferrer" className="hover:underline">Mateos et al., Blood Cancer J (2020)</a>
                   </div>
                 </div>
               );
