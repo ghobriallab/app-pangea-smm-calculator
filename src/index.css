@@ -9,27 +9,25 @@ body {
   font-family: 'Public Sans', sans-serif;
 }
 
-/* Fix input[type="month"] on iOS/WebKit */
+/* Fix input[type="month"] on iOS/WebKit:
+   -webkit-appearance:none is required so the input respects container width,
+   but it removes native chrome — so we enforce min-height + line-height
+   to prevent the empty input from collapsing to a thin line. */
 input[type="month"] {
   display: block;
   width: 100%;
   min-width: 0;
   max-width: 100%;
   box-sizing: border-box;
+  -webkit-appearance: none;
+  appearance: none;
   min-height: 42px;
+  line-height: 1.5;
 }
-
-/* Show placeholder text when empty on iOS (no native ::-webkit-datetime-edit content) */
-input[type="month"]::-webkit-datetime-edit-text,
-input[type="month"]::-webkit-datetime-edit-month-field,
-input[type="month"]::-webkit-datetime-edit-year-field {
-  padding: 0;
-}
-
-/* Ensure the inner edit area doesn't collapse */
 input[type="month"]::-webkit-datetime-edit {
   display: block;
-  min-height: 1.2em;
+  min-height: 1.5em;
+  line-height: 1.5;
   padding: 0;
   width: 100%;
 }

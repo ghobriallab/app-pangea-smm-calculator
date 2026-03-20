@@ -97,8 +97,8 @@ export function LabEntryDialog({
               <span className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1.5 h-8 flex items-end leading-tight">
                 Date (Month &amp; Year)<span className="text-red-500 ml-1">*</span>
               </span>
-              <div className="relative">
-                <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 material-symbols-outlined text-slate-400 dark:text-slate-500 text-lg">calendar_month</span>
+              <div className="relative overflow-hidden rounded-lg">
+                <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 material-symbols-outlined text-slate-400 dark:text-slate-500 text-lg z-10">calendar_month</span>
                 <input
                   type="month"
                   value={selectedMonth}
