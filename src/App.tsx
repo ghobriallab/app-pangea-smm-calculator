@@ -128,6 +128,10 @@ function App() {
               The PANGEA-SMM Model predicts your risk of progression from SMM to multiple myeloma.
               The clinical gold-standard calculator for 20-2-20 criteria is also integrated below for comprehensive assessment.
             </p>
+            <a href="https://www.nature.com/articles/s41591-026-04304-x" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 text-sm font-semibold text-primary hover:underline">
+              <span className="material-symbols-outlined text-base">article</span>
+              Read the paper in Nature Medicine
+            </a>
           </div>
         </section>
 

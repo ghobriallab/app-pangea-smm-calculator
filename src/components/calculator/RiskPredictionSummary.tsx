@@ -72,11 +72,11 @@ export function RiskPredictionSummary({
               <th className="pb-2 font-black">Timeline</th>
               <th className="pb-2 font-black text-right">
                 <span className="sm:hidden">Baseline</span>
-                <span className="hidden sm:inline">Probability of Progression<br /><span className="text-[9px] font-normal">baseline model</span></span>
+                <span className="hidden sm:inline">Probability of Progression<br /><span className="text-[9px] font-normal">without history model</span></span>
               </th>
               <th className="pb-2 font-black text-right">
                 <span className="sm:hidden">Updated</span>
-                <span className="hidden sm:inline">Probability of Progression<br /><span className="text-[9px] font-normal">complete model</span></span>
+                <span className="hidden sm:inline">Probability of Progression<br /><span className="text-[9px] font-normal">with history model</span></span>
               </th>
             </tr>
           </thead>

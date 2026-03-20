@@ -109,6 +109,12 @@ export function PatientInputForm({
                 />
                 <div className="absolute top-full left-0 w-full pt-0.5">
                   <ValidationMessage field={key} validationState={validationState} />
+                  {key === 'hemoglobin' && !hasHistoricalEntries && rawValues.hemoglobin && rawValues.hemoglobin.trim() !== '' && !validationState.hemoglobin && (
+                    <p className="text-xs mt-0.5 flex items-center gap-0.5 text-amber-600 dark:text-amber-500">
+                      <span className="material-symbols-outlined text-sm leading-none">info</span>
+                      Only used with historical lab entries
+                    </p>
+                  )}
                 </div>
               </div>
             </label>

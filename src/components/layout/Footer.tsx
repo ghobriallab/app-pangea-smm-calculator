@@ -7,6 +7,9 @@ export function Footer() {
           <h2 className="text-sm font-black tracking-tight text-slate-900 dark:text-white uppercase">The Pangea Model</h2>
         </div>
        
+        <a href="https://www.nature.com/articles/s41591-026-04304-x" target="_blank" rel="noopener noreferrer" className="text-xs text-primary hover:underline mt-1">
+          Read the paper in Nature Medicine
+        </a>
         <p className="text-xs text-slate-400 mt-2">
           © 2026 by the Ghobrial Lab | Dana-Farber Cancer Institute | Boston, MA | USA
         </p>
