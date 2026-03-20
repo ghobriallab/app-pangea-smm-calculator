@@ -97,17 +97,21 @@ export function LabEntryDialog({
               <span className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1.5 h-8 flex items-end leading-tight">
                 Date (Month &amp; Year)<span className="text-red-500 ml-1">*</span>
               </span>
-              <input
-                type="month"
-                value={selectedMonth}
-                onChange={(e) => setSelectedMonth(e.target.value)}
-                max={currentDate || undefined}
-                className={`block min-w-0 w-full px-3 py-2 bg-white dark:bg-slate-800 border rounded-lg text-slate-900 dark:text-white focus:ring-2 focus:outline-none transition-all ${
-                  dateError
-                    ? 'border-red-500 focus:ring-red-500/50'
-                    : 'border-slate-300 dark:border-slate-600 focus:ring-primary/50 focus:border-primary hover:border-slate-400 dark:hover:border-slate-500'
-                }`}
-              />
+              <div className="relative">
+                <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 material-symbols-outlined text-slate-400 dark:text-slate-500 text-lg">calendar_month</span>
+                <input
+                  type="month"
+                  value={selectedMonth}
+                  onChange={(e) => setSelectedMonth(e.target.value)}
+                  max={currentDate || undefined}
+                  placeholder="YYYY-MM"
+                  className={`block min-w-0 w-full pl-9 pr-3 py-2 min-h-[42px] bg-white dark:bg-slate-800 border rounded-lg text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:ring-2 focus:outline-none transition-all ${
+                    dateError
+                      ? 'border-red-500 focus:ring-red-500/50'
+                      : 'border-slate-300 dark:border-slate-600 focus:ring-primary/50 focus:border-primary hover:border-slate-400 dark:hover:border-slate-500'
+                  }`}
+                />
+              </div>
               {dateError && (
                 <p className="text-xs text-red-600 dark:text-red-400 mt-1 flex items-start gap-0.5">
                   <span className="material-symbols-outlined text-sm leading-none shrink-0">error</span>
