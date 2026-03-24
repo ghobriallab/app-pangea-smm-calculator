@@ -11,6 +11,17 @@ interface LabEntryDialogProps {
   currentDate: string; // YYYY-MM — most recent observation date for validation
 }
 
+type RawInputs = Partial<Record<keyof PatientInputs, string>>;
+
+function toRaw(p?: PatientInputs): RawInputs {
+  return p ? Object.fromEntries(Object.entries(p).map(([k, v]) => [k, String(v)])) : {};
+}
+
+function toMonthStr(dateStr?: string): string {
+  if (!dateStr) return '';
+  return dateStr.substring(0, 7); // YYYY-MM
+}
+
 function isDateInRange(selectedMonth: string, currentDate: string): boolean {
   if (!selectedMonth || !currentDate) return false;
   const [selYear, selMonth] = selectedMonth.split('-').map(Number);
@@ -29,22 +40,9 @@ export function LabEntryDialog({
   initialDate,
   currentDate,
 }: LabEntryDialogProps) {
-  const toMonthStr = (dateStr?: string) => {
-    if (!dateStr) return '';
-    return dateStr.substring(0, 7); // YYYY-MM
-  };
 
   const [selectedMonth, setSelectedMonth] = useState(toMonthStr(initialDate));
-  const [inputs, setInputs] = useState<PatientInputs>(
-    initialInputs ?? {
-      mSpike: 0,
-      sflcRatio: 0,
-      boneMarrow: 0,
-      age: 0,
-      creatinine: 0,
-      hemoglobin: 0,
-    }
-  );
+  const [rawInputs, setRawInputs] = useState<RawInputs>(toRaw(initialInputs));
 
   const fields = [
     { label: 'Serum Free Light Chain Ratio', key: 'sflcRatio' as const, placeholder: 'Enter ratio (e.g. 15.5)', required: true },
@@ -53,8 +51,8 @@ export function LabEntryDialog({
     { label: 'Hemoglobin (g/dL)', key: 'hemoglobin' as const, placeholder: 'e.g. 10.5', required: true },
   ];
 
-  const handleInputChange = (field: keyof PatientInputs, value: number) => {
-    setInputs(prev => ({ ...prev, [field]: value }));
+  const handleInputChange = (field: keyof PatientInputs, value: string) => {
+    setRawInputs(prev => ({ ...prev, [field]: value }));
   };
 
   const dateValid = isDateInRange(selectedMonth, currentDate);
@@ -64,7 +62,7 @@ export function LabEntryDialog({
 
   const canSubmit =
     dateValid &&
-    fields.every(f => !f.required || (inputs[f.key] ?? 0) > 0);
+    fields.every(f => !f.required || (rawInputs[f.key] ?? '').trim() !== '');
 
   const handleSubmit = () => {
     if (!canSubmit) return;
@@ -73,7 +71,15 @@ export function LabEntryDialog({
       year: 'numeric',
       month: 'long',
     });
-    onSubmit(formattedDate, `${selectedMonth}-01`, inputs);
+    const parsed: PatientInputs = {
+      mSpike: parseFloat(rawInputs.mSpike ?? '') || 0,
+      sflcRatio: parseFloat(rawInputs.sflcRatio ?? '') || 0,
+      creatinine: parseFloat(rawInputs.creatinine ?? '') || 0,
+      hemoglobin: parseFloat(rawInputs.hemoglobin ?? '') || 0,
+      age: 0,
+      boneMarrow: 0,
+    };
+    onSubmit(formattedDate, `${selectedMonth}-01`, parsed);
     onClose();
   };
 
@@ -130,8 +136,8 @@ export function LabEntryDialog({
               </span>
               <input
                 type="number"
-                value={inputs[key] || ''}
-                onChange={(e) => handleInputChange(key, parseFloat(e.target.value) || 0)}
+                value={rawInputs[key] ?? ''}
+                onChange={(e) => handleInputChange(key, e.target.value)}
                 placeholder={placeholder}
                 required={required}
                 className="w-full px-3 py-2 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-lg text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:ring-2 focus:ring-primary/50 focus:border-primary focus:outline-none transition-all hover:border-slate-400 dark:hover:border-slate-500"
