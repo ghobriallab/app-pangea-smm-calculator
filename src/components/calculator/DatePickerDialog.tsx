@@ -11,6 +11,17 @@ interface LabEntryDialogProps {
   currentDate: string; // YYYY-MM — most recent observation date for validation
 }
 
+type RawInputs = Partial<Record<keyof PatientInputs, string>>;
+
+function toRaw(p?: PatientInputs): RawInputs {
+  return p ? Object.fromEntries(Object.entries(p).map(([k, v]) => [k, String(v)])) : {};
+}
+
+function toMonthStr(dateStr?: string): string {
+  if (!dateStr) return '';
+  return dateStr.substring(0, 7); // YYYY-MM
+}
+
 function isDateInRange(selectedMonth: string, currentDate: string): boolean {
   if (!selectedMonth || !currentDate) return false;
   const [selYear, selMonth] = selectedMonth.split('-').map(Number);
@@ -29,15 +40,6 @@ export function LabEntryDialog({
   initialDate,
   currentDate,
 }: LabEntryDialogProps) {
-  const toMonthStr = (dateStr?: string) => {
-    if (!dateStr) return '';
-    return dateStr.substring(0, 7); // YYYY-MM
-  };
-
-  type RawInputs = Partial<Record<keyof PatientInputs, string>>;
-
-  const toRaw = (p?: PatientInputs): RawInputs =>
-    p ? Object.fromEntries(Object.entries(p).map(([k, v]) => [k, String(v)])) : {};
 
   const [selectedMonth, setSelectedMonth] = useState(toMonthStr(initialDate));
   const [rawInputs, setRawInputs] = useState<RawInputs>(toRaw(initialInputs));
